@@ -1,30 +1,21 @@
 using System.Net.Http.Json;
 using ReleasesFileGenerator.Launchpad.Models;
 using ReleasesFileGenerator.Launchpad.Services.Contracts;
-using ReleasesFileGenerator.Launchpad.Services.Requests;
+using ReleasesFileGenerator.Launchpad.Services.Requests.Archive;
 using ReleasesFileGenerator.Launchpad.Types;
 
 namespace ReleasesFileGenerator.Launchpad.Services;
 
 public class ArchiveService : IArchiveService
 {
-    private const string BaseUrl = "https://api.launchpad.net";
-    private const string ApiVersion = "devel";
     private const string ResourcePath = "ubuntu/+archive/primary";
 
     public async Task<LaunchpadCollectionResponse<SourcePackagePublishingHistory>> GetPublishedSourcesAsync(
-        GetPublishedSourcesOptions? options = null,
-        HttpClient? httpClient = null,
+        GetPublishedSourcesOptionsBase? options = null,
         CancellationToken cancellationToken = default)
     {
-        options ??= GetPublishedSourcesOptions.Empty;
-        httpClient ??= new HttpClient();
-
-        httpClient.BaseAddress = new Uri(BaseUrl);
-        var requestUri = $"{ApiVersion}/{ResourcePath}?{options.ToQueryString()}";
-
-        var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-        var response = await httpClient.SendAsync(request, cancellationToken);
+        options ??= GetPublishedSourcesOptionsBase.Empty;
+        var response = await LaunchpadClient.GetAsync(ResourcePath, options, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {

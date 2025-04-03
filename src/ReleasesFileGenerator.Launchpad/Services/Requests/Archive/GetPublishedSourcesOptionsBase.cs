@@ -1,9 +1,9 @@
 using System.Web;
 using ReleasesFileGenerator.Launchpad.Types.Enums;
 
-namespace ReleasesFileGenerator.Launchpad.Services.Requests;
+namespace ReleasesFileGenerator.Launchpad.Services.Requests.Archive;
 
-public class GetPublishedSourcesOptions
+public class GetPublishedSourcesOptionsBase : RequestOptionsBase
 {
     public bool ExactMatch { get; set; } = false;
     public bool OrderByDate { get; set; } = true;
@@ -17,9 +17,9 @@ public class GetPublishedSourcesOptions
     public ArchivePublishingStatus? Status { get; set; } = null;
     public string? Version { get; set; } = null;
 
-    public static GetPublishedSourcesOptions Empty => new();
+    public static GetPublishedSourcesOptionsBase Empty => new();
 
-    internal string ToQueryString()
+    internal override string ToQueryString()
     {
         const string wsop = "getPublishedSources";
         var queryString = HttpUtility.ParseQueryString(string.Empty);

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ReleasesFileGenerator.Types;
@@ -83,7 +84,9 @@ public partial class DotnetVersion : IEquatable<DotnetVersion>, IComparable<Dotn
     }
 
     public static bool TryParseFromSourcePackageVersion(
-        string sourcePackageVersion, out DotnetVersion? sdkVersion, out DotnetVersion? runtimeVersion)
+        string sourcePackageVersion,
+        [NotNullWhen(returnValue: true)] out DotnetVersion? sdkVersion,
+        [NotNullWhen(returnValue: true)] out DotnetVersion? runtimeVersion)
     {
         sdkVersion = null;
         runtimeVersion = null;

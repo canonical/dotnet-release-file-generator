@@ -34,7 +34,7 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
     [JsonPropertyName("entries")]
     public IEnumerable<T> Entries { get; set; } = [];
 
-    public async Task<int> GetTotalSizeAsync(HttpClient? httpClient = null)
+    public async Task<int> GetTotalSizeAsync(CancellationToken cancellationToken = default)
     {
         if (TotalSize.HasValue)
         {
@@ -46,12 +46,11 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
             throw new ApplicationException("No total size or total size link available.");
         }
 
-        httpClient ??= new HttpClient();
-        var httpResponse = await httpClient.GetAsync(TotalSizeLink);
+        var response = await LaunchpadClient.HttpClient.GetAsync(TotalSizeLink, cancellationToken);
 
-        if (httpResponse.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
-            var totalSize = await httpResponse.Content.ReadAsStringAsync();
+            var totalSize = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!int.TryParse(totalSize, out var size))
             {
@@ -63,7 +62,7 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
         }
 
         throw new ApplicationException(
-            $"Failed to retrieve total size from {TotalSizeLink}. Status code: {httpResponse.StatusCode}");
+            $"Failed to retrieve total size from {TotalSizeLink}. Status code: {response.StatusCode}");
     }
 
     public async Task<LaunchpadCollectionResponse<T>?> GetNextPageAsync(HttpClient? httpClient = null)
