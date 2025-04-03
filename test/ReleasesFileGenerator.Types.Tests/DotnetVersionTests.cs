@@ -127,37 +127,75 @@ public class DotnetVersionTests
     }
 
     [Theory]
-    [InlineData("8.0.0", 8, 0, 0)]
-    [InlineData("8.0.101", 8, 0, 101)]
-    public void Parse_WithStableVersionAndRevisionInput_ShouldParseCorrectly(string versionString,
-        int major, int minor, int patch)
+    [InlineData("8.0.100-8.0.0-0ubuntu2", 8, 0, 100, 8, 0, 0)]
+    [InlineData("9.0.104-9.0.3-0ubuntu2", 9, 0, 104, 9, 0, 3)]
+    public void TryParseFromSourcePackageVersion_WithStableVersionInput_ShouldParseCorrectly(string versionString,
+        int sdkMajor, int sdkMinor, int sdkPatch, int runtimeMajor, int runtimeMinor, int runtimePatch)
     {
         // Act
-        var version = DotnetVersion.Parse(versionString);
+        var success = DotnetVersion.TryParseFromSourcePackageVersion(
+            versionString, out var sdkVersion, out var runtimeVersion);
 
         // Assert
-        Assert.Equal(major, version.Major);
-        Assert.Equal(minor, version.Minor);
-        Assert.Equal(patch, version.Patch);
+        Assert.True(success);
+        Assert.NotNull(sdkVersion);
+        Assert.NotNull(runtimeVersion);
+
+        Assert.Equal(sdkVersion.Major, sdkMajor);
+        Assert.Equal(sdkVersion.Minor, sdkMinor);
+        Assert.Equal(sdkVersion.Patch, sdkPatch);
+
+        Assert.Equal(runtimeVersion.Major, runtimeMajor);
+        Assert.Equal(runtimeVersion.Minor, runtimeMinor);
+        Assert.Equal(runtimeVersion.Patch, runtimePatch);
     }
 
-
     [Theory]
-    [InlineData("8.0.0-preview.3", 8, 0, 0, true, false, 3)]
-    [InlineData("8.0.101-rc.1", 8, 0, 101, false, true, 1)]
-    public void Parse_WithPreviewVersionAndRevisionInput_ShouldParseCorrectly(string versionString, int major, int minor, int patch,
+    [InlineData("8.0.100-8.0.0~rc2-0ubuntu2", 8, 0, 100, 8, 0, 0, false, true, 2)]
+    [InlineData("9.0.104-9.0.3~preview1-0ubuntu2", 9, 0, 104, 9, 0, 3, true, false, 1)]
+    public void TryParseFromSourcePackageVersion_WithPreviewVersionInput_ShouldParseCorrectly(string versionString,
+        int sdkMajor, int sdkMinor, int sdkPatch, int runtimeMajor, int runtimeMinor, int runtimePatch,
         bool isPreview, bool isRc, int previewIdentifier)
     {
         // Act
-        var version = DotnetVersion.Parse(versionString);
+        var success = DotnetVersion.TryParseFromSourcePackageVersion(
+            versionString, out var sdkVersion, out var runtimeVersion);
 
         // Assert
-        Assert.Equal(major, version.Major);
-        Assert.Equal(minor, version.Minor);
-        Assert.Equal(patch, version.Patch);
-        Assert.Equal(isPreview, version.IsPreview);
-        Assert.Equal(isRc, version.IsRc);
-        Assert.Equal(previewIdentifier, version.PreviewIdentifier);
+        Assert.True(success);
+        Assert.NotNull(sdkVersion);
+        Assert.NotNull(runtimeVersion);
+
+        Assert.Equal(sdkVersion.Major, sdkMajor);
+        Assert.Equal(sdkVersion.Minor, sdkMinor);
+        Assert.Equal(sdkVersion.Patch, sdkPatch);
+        Assert.Equal(sdkVersion.IsPreview, isPreview);
+        Assert.Equal(sdkVersion.IsRc, isRc);
+        Assert.Equal(sdkVersion.PreviewIdentifier, previewIdentifier);
+
+        Assert.Equal(runtimeVersion.Major, runtimeMajor);
+        Assert.Equal(runtimeVersion.Minor, runtimeMinor);
+        Assert.Equal(runtimeVersion.Patch, runtimePatch);
+        Assert.Equal(runtimeVersion.IsPreview, isPreview);
+        Assert.Equal(runtimeVersion.IsRc, isRc);
+        Assert.Equal(runtimeVersion.PreviewIdentifier, previewIdentifier);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("8.0.100-blah-blah-8.0.0~rc2-0ubuntu2")]
+    [InlineData("9.0.104-403-9.0.3~preview1-0ubuntu2+123")]
+    public void TryParseFromSourcePackageVersion_WithInvalidVersionInput_ShouldReturnFalse(string? versionString)
+    {
+        // Act
+        var success = DotnetVersion.TryParseFromSourcePackageVersion(
+            versionString!, out var sdkVersion, out var runtimeVersion);
+
+        // Assert
+        Assert.False(success);
+        Assert.Null(sdkVersion);
+        Assert.Null(runtimeVersion);
     }
 
     [Theory]

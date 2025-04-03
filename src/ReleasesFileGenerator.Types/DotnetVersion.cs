@@ -1,9 +1,13 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ReleasesFileGenerator.Types;
 
 public partial class DotnetVersion : IEquatable<DotnetVersion>, IComparable<DotnetVersion>
 {
+    private static readonly Regex DotnetSourcePackageVersionPattern = new(
+        @"^(?<SDKVersion>\d+\.\d+\.\d+)-(?<RuntimeVersion>\d+\.\d+\.\d+)(?:~(?<PreviewStatus>rc\d+|preview\d+))?-(?<UbuntuVersion>\d+ubuntu\d+)(?:~(?<UbuntuPreRelease>[\w\d\.]+))?$");
+
     public DotnetVersion(int major, int minor, int patch, bool isPreview = false, bool isRc = false,
         int? previewIdentifier = null)
     {
@@ -76,6 +80,63 @@ public partial class DotnetVersion : IEquatable<DotnetVersion>, IComparable<Dotn
         }
 
         return parsedVersion;
+    }
+
+    public static bool TryParseFromSourcePackageVersion(
+        string sourcePackageVersion, out DotnetVersion? sdkVersion, out DotnetVersion? runtimeVersion)
+    {
+        sdkVersion = null;
+        runtimeVersion = null;
+        if (string.IsNullOrWhiteSpace(sourcePackageVersion)) return false;
+
+        var parsedVersion = DotnetSourcePackageVersionPattern.Match(sourcePackageVersion);
+
+        if (!parsedVersion.Success) return false;
+
+        // Check for pre-release version
+        var isPreview = parsedVersion.Groups["PreviewStatus"].Success &&
+                        parsedVersion.Groups["PreviewStatus"].Value.StartsWith("preview");
+        var isRc = parsedVersion.Groups["PreviewStatus"].Success &&
+                   parsedVersion.Groups["PreviewStatus"].Value.StartsWith("rc");
+
+        int? previewIdentifier = null;
+        if (isPreview || isRc)
+        {
+            var previewIdentifierRegex = Regex.Match(parsedVersion.Groups["PreviewStatus"].Value, @"\d+");
+            if (previewIdentifierRegex.Success)
+            {
+                previewIdentifier = int.Parse(previewIdentifierRegex.Value);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Parse product versions
+        var splitSdkVersion = parsedVersion.Groups["SDKVersion"].Value.Split('.');
+        sdkVersion = new DotnetVersion
+        (
+            int.Parse(splitSdkVersion[0]),
+            int.Parse(splitSdkVersion[1]),
+            int.Parse(splitSdkVersion[2]),
+            isPreview,
+            isRc,
+            previewIdentifier
+        );
+
+        var splitRuntimeVersion = parsedVersion.Groups["RuntimeVersion"].Value.Split('.');
+        runtimeVersion = new DotnetVersion
+        (
+            int.Parse(splitRuntimeVersion[0]),
+            int.Parse(splitRuntimeVersion[1]),
+            int.Parse(splitRuntimeVersion[2]),
+            isPreview,
+            isRc,
+            previewIdentifier
+        );
+
+        return true;
     }
 
     public override string ToString()
