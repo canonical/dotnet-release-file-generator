@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReleasesFileGenerator.Console", "src\ReleasesFileGenerator.Console\ReleasesFileGenerator.Console.csproj", "{49E453F6-1C26-42C5-8E28-C50043C538D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8530410C-B530-4989-AA47-67855439E797}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReleasesFileGenerator.Launchpad", "src\ReleasesFileGenerator.Launchpad\ReleasesFileGenerator.Launchpad.csproj", "{017BC93D-5E86-4A9E-8621-75332D65491C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{49E453F6-1C26-42C5-8E28-C50043C538D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49E453F6-1C26-42C5-8E28-C50043C538D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49E453F6-1C26-42C5-8E28-C50043C538D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49E453F6-1C26-42C5-8E28-C50043C538D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{017BC93D-5E86-4A9E-8621-75332D65491C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{017BC93D-5E86-4A9E-8621-75332D65491C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{017BC93D-5E86-4A9E-8621-75332D65491C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{017BC93D-5E86-4A9E-8621-75332D65491C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{49E453F6-1C26-42C5-8E28-C50043C538D0} = {8530410C-B530-4989-AA47-67855439E797}
+		{017BC93D-5E86-4A9E-8621-75332D65491C} = {8530410C-B530-4989-AA47-67855439E797}
+	EndGlobalSection
+EndGlobal
