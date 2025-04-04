@@ -1,5 +1,3 @@
-using ReleasesFileGenerator.Launchpad.Services.Requests;
-
 namespace ReleasesFileGenerator.Launchpad;
 
 internal static class LaunchpadClient
@@ -20,6 +18,12 @@ internal static class LaunchpadClient
         var requestUrl = BuildRequestUrl(resourcePath, options);
         var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
         return HttpClient.SendAsync(request, cancellationToken);
+    }
+
+    internal static string GetResourcePath(Uri selfLink)
+    {
+        ArgumentNullException.ThrowIfNull(selfLink, nameof(selfLink));
+        return selfLink.ToString().Replace($"{BaseUrl}/{ApiVersion}/", string.Empty);
     }
 
     private static string BuildRequestUrl(string resourcePath, RequestOptionsBase? options)

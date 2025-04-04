@@ -1,7 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Text.Json.Serialization;
-using ReleasesFileGenerator.Launchpad.Converters;
 
 namespace ReleasesFileGenerator.Launchpad.Models;
 
@@ -14,18 +12,15 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
     public int? TotalSize { get; set; }
 
     [JsonPropertyName("total_size_link")]
-    [JsonConverter(typeof(UriJsonConverter))]
     public Uri? TotalSizeLink { get; set; }
 
     [JsonPropertyName("next_collection_link")]
-    [JsonConverter(typeof(UriJsonConverter))]
     public Uri? NextCollectionLink { get; set; }
 
     [JsonIgnore]
     public bool HasNextPage => NextCollectionLink != null;
 
     [JsonPropertyName("previous_collection_link")]
-    [JsonConverter(typeof(UriJsonConverter))]
     public Uri? PreviousCollectionLink { get; set; }
 
     [JsonIgnore]

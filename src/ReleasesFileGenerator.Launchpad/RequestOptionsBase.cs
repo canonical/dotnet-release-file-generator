@@ -1,4 +1,4 @@
-namespace ReleasesFileGenerator.Launchpad.Services.Requests;
+namespace ReleasesFileGenerator.Launchpad;
 
 public abstract class RequestOptionsBase
 {

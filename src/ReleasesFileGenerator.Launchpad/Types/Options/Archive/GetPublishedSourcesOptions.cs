@@ -1,15 +1,15 @@
 using System.Web;
 using ReleasesFileGenerator.Launchpad.Types.Enums;
 
-namespace ReleasesFileGenerator.Launchpad.Services.Requests.Archive;
+namespace ReleasesFileGenerator.Launchpad.Types.Options.Archive;
 
-public class GetPublishedSourcesOptionsBase : RequestOptionsBase
+public class GetPublishedSourcesOptions : RequestOptionsBase
 {
     public bool ExactMatch { get; set; } = false;
     public bool OrderByDate { get; set; } = true;
     public bool OrderByDateAscending { get; set; } = false;
 
-    public string? Component { get; set; } = null;
+    public string? ComponentName { get; set; } = null;
     public DateTimeOffset? CreatedSince { get; set; } = null;
     public Uri? DistroSeries { get; set; } = null;
     public ArchivePocket? Pocket { get; set; } = null;
@@ -17,7 +17,7 @@ public class GetPublishedSourcesOptionsBase : RequestOptionsBase
     public ArchivePublishingStatus? Status { get; set; } = null;
     public string? Version { get; set; } = null;
 
-    public static GetPublishedSourcesOptionsBase Empty => new();
+    public static GetPublishedSourcesOptions Empty => new();
 
     internal override string ToQueryString()
     {
@@ -29,8 +29,8 @@ public class GetPublishedSourcesOptionsBase : RequestOptionsBase
         queryString.Add("order_by_date", OrderByDate.ToString().ToLowerInvariant());
         queryString.Add("order_by_date_ascending", OrderByDateAscending.ToString().ToLowerInvariant());
 
-        if (Component is not null)
-            queryString.Add("component_name", Component);
+        if (ComponentName is not null)
+            queryString.Add("component_name", ComponentName);
         if (CreatedSince is not null)
             queryString.Add("created_since_date", CreatedSince.ToString());
         if (DistroSeries is not null)
