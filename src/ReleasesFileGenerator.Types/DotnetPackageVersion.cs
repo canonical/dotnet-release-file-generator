@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -90,6 +91,21 @@ public class DotnetPackageVersion
         }
 
         return packageVersion;
+    }
+
+    public static bool TryCreate(string sourcePackageName, string sourcePackageVersion,
+        [NotNullWhen(returnValue: true)] out DotnetPackageVersion? packageVersion)
+    {
+        try
+        {
+            packageVersion = Create(sourcePackageName, sourcePackageVersion);
+            return true;
+        }
+        catch (FormatException)
+        {
+            packageVersion = null;
+            return false;
+        }
     }
 
     public string GetUbuntuRuntimePackageVersion()
