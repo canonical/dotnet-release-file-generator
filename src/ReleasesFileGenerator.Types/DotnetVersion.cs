@@ -17,12 +17,6 @@ public partial class DotnetVersion : IEquatable<DotnetVersion>, IComparable<Dotn
             throw new ApplicationException("The .NET version can either be a preview, an RC, or none.");
         }
 
-        if ((isPreview || isRc) && previewIdentifier is null)
-        {
-            throw new ApplicationException(
-                "You must specify a Preview Identifier if version is either a preview of an RC.");
-        }
-
         if (!isPreview && !isRc && previewIdentifier is not null)
         {
             throw new ApplicationException(
@@ -66,18 +60,21 @@ public partial class DotnetVersion : IEquatable<DotnetVersion>, IComparable<Dotn
 
         if (previewSplit.Length > 1)
         {
-            var previewVersionSections = previewSplit[1].Split('.');
+            var previewIdentifierRegex = Regex.Match(previewSplit[1], @"\d+");
 
-            if (string.Equals("preview", previewVersionSections[0]))
+            if (previewSplit[1].Contains("preview"))
             {
                 parsedVersion.IsPreview = true;
             }
-            else if (string.Equals("rc", previewVersionSections[0]))
+            else if (previewSplit[1].Contains("rc"))
             {
                 parsedVersion.IsRc = true;
             }
 
-            parsedVersion.PreviewIdentifier = int.Parse(previewVersionSections[1]);
+            if (previewIdentifierRegex.Success)
+            {
+                parsedVersion.PreviewIdentifier = int.Parse(previewIdentifierRegex.Value);
+            }
         }
 
         return parsedVersion;
@@ -152,10 +149,14 @@ public partial class DotnetVersion : IEquatable<DotnetVersion>, IComparable<Dotn
         versionBuilder.Append('.');
         versionBuilder.Append(Patch);
 
-        if (IsPreview) versionBuilder.Append("-preview.");
-        if (IsRc) versionBuilder.Append("-rc.");
+        if (IsPreview) versionBuilder.Append("-preview");
+        if (IsRc) versionBuilder.Append("-rc");
 
-        versionBuilder.Append(PreviewIdentifier.ToString());
+        if (PreviewIdentifier is not null)
+        {
+            versionBuilder.Append('.');
+            versionBuilder.Append(PreviewIdentifier.ToString());
+        }
 
         return versionBuilder.ToString();
     }

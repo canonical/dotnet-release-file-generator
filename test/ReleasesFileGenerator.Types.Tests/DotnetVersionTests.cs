@@ -1,4 +1,6 @@
-﻿namespace ReleasesFileGenerator.Types.Tests;
+﻿using Xunit.Sdk;
+
+namespace ReleasesFileGenerator.Types.Tests;
 
 public class DotnetVersionTests
 {
@@ -111,8 +113,10 @@ public class DotnetVersionTests
     [Theory]
     [InlineData("8.0.0-preview.3", 8, 0, 0, true, false, 3)]
     [InlineData("8.0.101-rc.1", 8, 0, 101, false, true, 1)]
+    [InlineData("3.1.0-rc1", 3, 1, 0, false, true, 1)]
+    [InlineData("2.2.600-preview", 2, 2, 600, true, false, null)]
     public void Parse_WithPreviewVersionInput_ShouldParseCorrectly(string versionString, int major, int minor, int patch,
-        bool isPreview, bool isRc, int previewIdentifier)
+        bool isPreview, bool isRc, int? previewIdentifier)
     {
         // Act
         var version = DotnetVersion.Parse(versionString);
@@ -202,6 +206,7 @@ public class DotnetVersionTests
     [InlineData(8, 0, 0, false, false, null, "8.0.0")]
     [InlineData(8, 0, 0, true, false, 1, "8.0.0-preview.1")]
     [InlineData(8, 0, 0, false, true, 2, "8.0.0-rc.2")]
+    [InlineData(3, 1, 0, false, true, null, "3.1.0-rc")]
     public void ToString_WhenCalled_ShouldStringifyVersionCorrectly(int major, int minor, int patch,
         bool isPreview, bool isRc, int? previewIdentifier, string expectedString)
     {
