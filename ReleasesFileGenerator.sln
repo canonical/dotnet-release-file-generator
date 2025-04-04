@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReleasesFileGenerator.Launc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReleasesFileGenerator.Types", "src\ReleasesFileGenerator.Types\ReleasesFileGenerator.Types.csproj", "{198098E9-D340-494D-91C8-F880A0B5AC4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReleasesFileGenerator.Types.Tests", "test\ReleasesFileGenerator.Types.Tests\ReleasesFileGenerator.Types.Tests.csproj", "{DBE5DDCF-F303-45F2-B4ED-7A5FEBB7490A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReleasesFileGenerator.Types.UnitTests", "test\ReleasesFileGenerator.Types.UnitTests\ReleasesFileGenerator.Types.UnitTests.csproj", "{DBE5DDCF-F303-45F2-B4ED-7A5FEBB7490A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{FC0F7814-3D48-4440-8AF4-381C759A8B37}"
 EndProject

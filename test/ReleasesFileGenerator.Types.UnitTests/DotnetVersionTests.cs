@@ -1,6 +1,6 @@
 ﻿using Xunit.Sdk;
 
-namespace ReleasesFileGenerator.Types.Tests;
+namespace ReleasesFileGenerator.Types.UnitTests;
 
 public class DotnetVersionTests
 {
