@@ -7,11 +7,11 @@ namespace ReleasesFileGenerator.Types;
 public class DotnetPackageVersion
 {
     private static readonly Regex DotnetSourcePackageVersionPattern = new(
-        @"^(?<SDKVersion>\d+\.\d+\.\d+)-(?<RuntimeVersion>\d+\.\d+\.\d+)(?:~(?<PreviewStatus>rc\d+|preview\d+))?-(?<UbuntuSuffix>\d+ubuntu\d+)(?:~(?<UbuntuPreRelease>[\w\d\.]+))?$");
+        @"^(?<SDKVersion>\d+\.\d+\.\d+)(?:-(?<RuntimeVersion>\d+\.\d+\.\d+))?(?:~(?<PreviewStatus>rc\d+|preview\d+))?-(?<UbuntuSuffix>\d+ubuntu\d+)(?:~(?<UbuntuPreRelease>[\w\d\.]+))?$");
 
     public required string SourcePackageName { get; set; }
     public required string SourcePackageVersionString { get; set; }
-    public required DotnetVersion UpstreamRuntimeVersion { get; set; }
+    public DotnetVersion? UpstreamRuntimeVersion { get; set; }
     public required DotnetVersion UpstreamSdkVersion { get; set; }
     public required string UbuntuSuffix { get; set; }
     public string? UbuntuPreRelease { get; set; }
@@ -65,16 +65,20 @@ public class DotnetPackageVersion
             previewIdentifier
         );
 
-        var splitRuntimeVersion = parsedVersion.Groups["RuntimeVersion"].Value.Split('.');
-        var upstreamRuntimeVersion = new DotnetVersion
-        (
-            int.Parse(splitRuntimeVersion[0]),
-            int.Parse(splitRuntimeVersion[1]),
-            int.Parse(splitRuntimeVersion[2]),
-            isPreview,
-            isRc,
-            previewIdentifier
-        );
+        var upstreamRuntimeVersion = default(DotnetVersion);
+        if (parsedVersion.Groups["RuntimeVersion"].Success)
+        {
+            var splitRuntimeVersion = parsedVersion.Groups["RuntimeVersion"].Value.Split('.');
+            upstreamRuntimeVersion = new DotnetVersion
+            (
+                int.Parse(splitRuntimeVersion[0]),
+                int.Parse(splitRuntimeVersion[1]),
+                int.Parse(splitRuntimeVersion[2]),
+                isPreview,
+                isRc,
+                previewIdentifier
+            );
+        }
 
         var packageVersion = new DotnetPackageVersion
         {
@@ -108,8 +112,13 @@ public class DotnetPackageVersion
         }
     }
 
-    public string GetUbuntuRuntimePackageVersion()
+    public string? GetUbuntuRuntimePackageVersion()
     {
+        if (UpstreamRuntimeVersion is null)
+        {
+            return null;
+        }
+
         var sb = new StringBuilder();
 
         if (UpstreamRuntimeVersion.IsStable)
