@@ -11,7 +11,7 @@ public class GetPublishedSourcesOptions : RequestOptionsBase
 
     public string? ComponentName { get; set; } = null;
     public DateTimeOffset? CreatedSince { get; set; } = null;
-    public Uri? DistroSeries { get; set; } = null;
+    public Uri? DistroSeriesLink { get; set; } = null;
     public ArchivePocket? Pocket { get; set; } = null;
     public string? SourcePackageName { get; set; } = null;
     public ArchivePublishingStatus? Status { get; set; } = null;
@@ -33,8 +33,8 @@ public class GetPublishedSourcesOptions : RequestOptionsBase
             queryString.Add("component_name", ComponentName);
         if (CreatedSince is not null)
             queryString.Add("created_since_date", CreatedSince.ToString());
-        if (DistroSeries is not null)
-            queryString.Add("distro_series", DistroSeries.ToString());
+        if (DistroSeriesLink is not null)
+            queryString.Add("distro_series", DistroSeriesLink.ToString());
         if (Pocket is not null)
             queryString.Add("pocket", Enum.GetName(Pocket.Value));
         if (SourcePackageName is not null)

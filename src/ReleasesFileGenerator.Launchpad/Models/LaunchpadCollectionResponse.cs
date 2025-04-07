@@ -60,14 +60,14 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
             $"Failed to retrieve total size from {TotalSizeLink}. Status code: {response.StatusCode}");
     }
 
-    public async Task<LaunchpadCollectionResponse<T>?> GetNextPageAsync(HttpClient? httpClient = null)
+    public async Task<LaunchpadCollectionResponse<T>?> GetNextPageAsync()
     {
         if (!HasNextPage)
         {
             return null;
         }
 
-        httpClient ??= new HttpClient();
+        var httpClient = LaunchpadClient.HttpClient;
         var httpResponse = await httpClient.GetAsync(NextCollectionLink);
 
         if (httpResponse.IsSuccessStatusCode)
@@ -81,14 +81,14 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
             $"Failed to retrieve next page from {NextCollectionLink}. Status code: {httpResponse.StatusCode}");
     }
 
-    public async Task<LaunchpadCollectionResponse<T>?> GetPreviousPageAsync(HttpClient? httpClient = null)
+    public async Task<LaunchpadCollectionResponse<T>?> GetPreviousPageAsync()
     {
         if (!HasPreviousPage)
         {
             return null;
         }
 
-        httpClient ??= new HttpClient();
+        var httpClient = LaunchpadClient.HttpClient;
         var httpResponse = await httpClient.GetAsync(PreviousCollectionLink);
 
         if (httpResponse.IsSuccessStatusCode)

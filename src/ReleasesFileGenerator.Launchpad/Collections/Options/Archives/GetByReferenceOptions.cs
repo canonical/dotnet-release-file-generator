@@ -11,6 +11,11 @@ public class GetByReferenceOptions : RequestOptionsBase
         Reference = string.Empty
     };
 
+    public static GetByReferenceOptions Ubuntu => new()
+    {
+        Reference = "ubuntu"
+    };
+
     internal override string ToQueryString()
     {
         const string wsop = "getByReference";
