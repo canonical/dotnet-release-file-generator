@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using ReleasesFileGenerator.Console.Helpers;
 using ReleasesFileGenerator.Console.Models;
 using ReleasesFileGenerator.Launchpad.Collections;
@@ -12,6 +13,7 @@ using ReleasesFileGenerator.Launchpad.Types.Options.BinaryPackagePublishingHisto
 using ReleasesFileGenerator.Launchpad.Types.Options.Distribution;
 using ReleasesFileGenerator.Types;
 using ReleasesFileGenerator.Types.ReleasesFile;
+using Spectre.Console;
 
 namespace ReleasesFileGenerator.Console;
 
@@ -20,25 +22,45 @@ public class Program
     private const string MicrosoftReleasesUrl =
         "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json";
 
-    private static DirectoryInfo WorkingDirectory = Directory.CreateTempSubdirectory("releases-file-generator-");
+    private static readonly DirectoryInfo WorkingDirectory =
+        Directory.CreateTempSubdirectory("releases-file-generator-");
+
+    private static ILogger? _logger;
 
     private static async Task<int> Main(string[] args)
     {
+        #region Logging
+        using var factory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole(options =>
+            {
+                options.LogToStandardErrorThreshold = LogLevel.Error;
+            });
+        });
+        _logger = factory.CreateLogger<Program>();
+        #endregion
+
         var series = args.ElementAtOrDefault(0);
         if (string.IsNullOrWhiteSpace(series))
         {
-            await System.Console.Error.WriteLineAsync("No series provided.");
+            _logger.LogError("No series provided.");
             return -1;
         }
+
+        _logger.LogInformation("Generating releases file for series {Series}", series);
+        _logger.LogInformation("Using working directory {Path}", WorkingDirectory.FullName);
 
         var manifest = await File.ReadAllTextAsync($"Manifests/{series}.json");
         var currentlyAvailableVersions = JsonSerializer.Deserialize<List<AvailableVersionEntry>>(manifest);
 
         if (currentlyAvailableVersions is null)
         {
-            await System.Console.Error.WriteLineAsync("Failed to deserialize available versions.");
+            _logger.LogError("Failed to deserialize available versions.");
             return -1;
         }
+
+        _logger.LogInformation("Found {Count} available versions for series {Series}",
+            currentlyAvailableVersions.Count, series);
 
         var ubuntuArchive = await Archives.GetByReference(GetByReferenceOptions.Ubuntu);
         var distribution = await ubuntuArchive.GetDistributionAsync();
@@ -47,6 +69,9 @@ public class Program
         var index = new List<Channel>();
         foreach (var version in currentlyAvailableVersions)
         {
+            _logger.LogInformation("Processing version {Version} ({SourcePackageName})",
+                version.ChannelVersion, version.SourcePackageName);
+
             var channel = new Channel
             {
                 ChannelVersion = version.ChannelVersion,
@@ -77,17 +102,23 @@ public class Program
 
             if (latestRelease is null)
             {
-                throw new ApplicationException("Could not determine latest published version.");
+                _logger.LogError("Could not determine latest published version.");
             }
 
             var latestDotNetVersion = DotnetPackageVersion.Create(
-                latestRelease.SourcePackageName,
+                latestRelease!.SourcePackageName,
                 latestRelease.SourcePackageVersion);
+
+            _logger.LogInformation("Latest release for version {Version} is {Release}",
+                version.ChannelVersion, latestRelease.SourcePackageVersion);
 
             // Verify if the latest version was a security release by checking if it was published to the
             // security pocket.
             channel.Security = latestSecurityRelease is not null &&
                                latestRelease.SourcePackageVersion == latestSecurityRelease.SourcePackageVersion;
+
+            _logger.LogInformation("Version {Version} security release status: {IsSecurityRelease}",
+                latestRelease.SourcePackageVersion, channel.Security);
 
             // .NET versions equal to or higher than 8.0 contain both the Runtime and SDK versions in the source
             // package version. Also, if the .NET version is not a pre-release version, we can also use the versions
@@ -103,8 +134,10 @@ public class Program
             }
             else
             {
-                System.Console.WriteLine(
-                    $"Analyzing source {latestRelease.SourcePackageName} [{latestRelease.SourcePackageVersion}]");
+                _logger.LogInformation(
+                    "{Name} {Version} is a pre-release version or does not contain the runtime version in the source package version. " +
+                    "Downloading packages to determine the versions.",
+                    latestRelease.SourcePackageName, latestRelease.SourcePackageVersion);
 
                 var runtimePackageFile = await GetPackageFile(
                     ubuntuArchive,
@@ -134,6 +167,9 @@ public class Program
                 channel.LatestSdk = latestVersions.SdkVersion;
             }
 
+            _logger.LogInformation("Version {Version} latest versions: Runtime: {Runtime}, SDK: {Sdk}",
+                version.ChannelVersion, channel.LatestRuntime, channel.LatestSdk);
+
             index.Add(channel);
         }
 
@@ -145,6 +181,9 @@ public class Program
         await File.WriteAllTextAsync(
             $"{WorkingDirectory.FullName}/releases-index.json",
             JsonSerializer.Serialize(releasesFile));
+
+        _logger.LogInformation("Releases file generated at {Path}",
+            $"{WorkingDirectory.FullName}/releases-index.json");
 
         return 0;
     }
@@ -200,22 +239,37 @@ public class Program
         BinaryPackageFile aspnetCoreRuntimePackageFile,
         BinaryPackageFile sdkPackageFile)
     {
-        var runtimeDownloadProgress = new Progress<double>(percent =>
-            System.Console.WriteLine($"[.NET Runtime] Downloaded {percent:F2}%"));
-        var runtimeDownloadTask = FileDownloader.DownloadFileAsync(runtimePackageFile.Url,
-            WorkingDirectory.FullName, runtimeDownloadProgress);
+        await AnsiConsole.Progress()
+            .HideCompleted(true)
+            .Columns(
+                new TaskDescriptionColumn(),
+                new ProgressBarColumn(),
+                new PercentageColumn(),
+                new RemainingTimeColumn(),
+                new SpinnerColumn(),
+                new DownloadedColumn(),
+                new TransferSpeedColumn())
+            .StartAsync(async ctx =>
+            {
+                var runtimeDownloadProgressTask =
+                    ctx.AddTask(".NET Runtime", autoStart: true, maxValue: runtimePackageFile.Size!.Value);
+                var aspnetCoreRuntimeDownloadProgressTask =
+                    ctx.AddTask("ASP.NET Core Runtime", autoStart: true, maxValue: aspnetCoreRuntimePackageFile.Size!.Value);
+                var sdkDownloadProgressTask =
+                    ctx.AddTask(".NET SDK", autoStart: true, maxValue: sdkPackageFile.Size!.Value);
 
-        var aspnetCoreRuntimeDownloadProgress = new Progress<double>(percent =>
-            System.Console.WriteLine($"[ASP.NET Core Runtime] Downloaded {percent:F2}%"));
-        var aspnetCoreRuntimeDownloadTask = FileDownloader.DownloadFileAsync(aspnetCoreRuntimePackageFile.Url,
-            WorkingDirectory.FullName, aspnetCoreRuntimeDownloadProgress);
+                var runtimeDownloadTask = FileDownloader.DownloadFileAsync(runtimePackageFile.Url,
+                    WorkingDirectory.FullName, new Progress<double>(percent =>
+                        runtimeDownloadProgressTask.Increment(percent)));
+                var aspnetCoreRuntimeDownloadTask = FileDownloader.DownloadFileAsync(aspnetCoreRuntimePackageFile.Url,
+                    WorkingDirectory.FullName, new Progress<double>(percent =>
+                        aspnetCoreRuntimeDownloadProgressTask.Increment(percent)));
+                var sdkDownloadTask = FileDownloader.DownloadFileAsync(sdkPackageFile.Url,
+                    WorkingDirectory.FullName, new Progress<double>(percent =>
+                        sdkDownloadProgressTask.Increment(percent)));
 
-        var sdkDownloadProgress = new Progress<double>(percent =>
-            System.Console.WriteLine($"[.NET SDK] Downloaded {percent:F2}%"));
-        var sdkDownloadTask = FileDownloader.DownloadFileAsync(sdkPackageFile.Url,
-            WorkingDirectory.FullName, sdkDownloadProgress);
-
-        await Task.WhenAll(runtimeDownloadTask, aspnetCoreRuntimeDownloadTask, sdkDownloadTask);
+                await Task.WhenAll(runtimeDownloadTask, aspnetCoreRuntimeDownloadTask, sdkDownloadTask);
+            });
 
         DebFile.ExtractDebFile($"{WorkingDirectory.FullName}/{runtimePackageFile.Url.Segments.Last()}",
             WorkingDirectory.FullName);
