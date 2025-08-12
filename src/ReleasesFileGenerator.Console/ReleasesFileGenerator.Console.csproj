@@ -11,5 +11,11 @@
       <ProjectReference Include="..\ReleasesFileGenerator.Launchpad\ReleasesFileGenerator.Launchpad.csproj" />
       <ProjectReference Include="..\ReleasesFileGenerator.Types\ReleasesFileGenerator.Types.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <None Update="Manifests\**\*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 </Project>

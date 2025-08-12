@@ -1,4 +1,4 @@
-namespace ReleasesFileGenerator.Console;
+namespace ReleasesFileGenerator.Console.Helpers;
 
 public static class FileDownloader
 {

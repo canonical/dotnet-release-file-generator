@@ -187,8 +187,8 @@ public class DotnetVersionOperatorsTests
         var version4 = new DotnetVersion(8, 0, 103);
 
         // Act
-        var equal = DotnetVersion.Equals(version1, version2, DotnetVersionComparison.Default);
-        var different = DotnetVersion.Equals(version3, version4, DotnetVersionComparison.Default);
+        var equal = DotnetVersion.Equals(version1, version2);
+        var different = DotnetVersion.Equals(version3, version4);
 
         // Assert
         Assert.True(equal);
@@ -206,8 +206,8 @@ public class DotnetVersionOperatorsTests
         var version4 = new DotnetVersion(8, 0, 103);
 
         // Act
-        var equal = DotnetVersion.Equals(version1, version2, DotnetVersionComparison.IgnoreRevision);
-        var different = DotnetVersion.Equals(version3, version4, DotnetVersionComparison.IgnoreRevision);
+        var equal = DotnetVersion.Equals(version1, version2);
+        var different = DotnetVersion.Equals(version3, version4);
 
         // Assert
         Assert.True(equal);

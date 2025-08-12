@@ -169,11 +169,46 @@ public class Archive : LaunchpadEntryType
     public int RelativeBuildScore { get; set; }
 
     /// <summary>
+    /// Get the <see cref="Distribution">Distribution</see> for this archive.
+    /// </summary>
+    /// <param name="cancellationToken">The request cancellation token.</param>
+    /// <returns>
+    /// A <see cref="Distribution">Distribution</see> object representing the distribution for this archive.
+    /// </returns>
+    /// <exception cref="ApplicationException">
+    /// When either the request or deserialization fails.
+    /// </exception>
+    public async Task<Distribution> GetDistributionAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var response = await LaunchpadClient.GetAsync(LaunchpadClient.GetResourcePath(DistributionLink),
+            cancellationToken: cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApplicationException("Failed to get distribution for archive");
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<Distribution>(cancellationToken: cancellationToken);
+
+        if (result is null)
+        {
+            throw new ApplicationException("Failed to get distribution for archive");
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// All <see cref="BinaryPackagePublishingHistory">BinaryPackagePublishingHistory</see> target to this archive.
     /// </summary>
     /// <param name="options">The request parameters.</param>
     /// <param name="cancellationToken">The request cancellation token.</param>
-    /// <returns></returns>
+    /// <returns>
+    /// A <see cref="LaunchpadCollectionResponse{BinaryPackagePublishingHistory}"/> containing the
+    /// <see cref="BinaryPackagePublishingHistory">BinaryPackagePublishingHistory</see> objects
+    /// that have been published to this archive.
+    /// </returns>
     /// <exception cref="ApplicationException">When either the request or deserialization fails.</exception>
     public async Task<LaunchpadCollectionResponse<BinaryPackagePublishingHistory>> GetPublishedBinariesAsync(
         GetPublishedBinariesOptions? options = null,
@@ -205,7 +240,11 @@ public class Archive : LaunchpadEntryType
     /// </summary>
     /// <param name="options">The request parameters.</param>
     /// <param name="cancellationToken">The request cancellation token.</param>
-    /// <returns></returns>
+    /// <returns>
+    /// A <see cref="LaunchpadCollectionResponse{SourcePackagePublishingHistory}"/> containing the
+    /// <see cref="SourcePackagePublishingHistory">SourcePackagePublishingHistory</see> objects
+    /// that have been published to this archive.
+    /// </returns>
     /// <exception cref="ApplicationException">When either the request or deserialization fails.</exception>
     public async Task<LaunchpadCollectionResponse<SourcePackagePublishingHistory>> GetPublishedSourcesAsync(
         GetPublishedSourcesOptions? options = null,
