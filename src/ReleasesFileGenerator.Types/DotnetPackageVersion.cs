@@ -1,20 +1,21 @@
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ReleasesFileGenerator.Types;
 
-public class DotnetPackageVersion
+public partial class DotnetPackageVersion : IComparable<DotnetPackageVersion>
 {
     private static readonly Regex DotnetSourcePackageVersionPattern = new(
         @"^(?<SDKVersion>\d+\.\d+\.\d+)(?:-(?<RuntimeVersion>\d+\.\d+\.\d+))?(?:~(?<PreviewStatus>rc\d+|preview\d+))?-(?<UbuntuSuffix>\d+ubuntu\d+)(?:~(?<UbuntuPreRelease>[\w\d\.]+))?$");
 
     public required string SourcePackageName { get; set; }
-    public required string SourcePackageVersionString { get; set; }
+    public required string SourcePackageVersion { get; set; }
     public DotnetVersion? UpstreamRuntimeVersion { get; set; }
     public required DotnetVersion UpstreamSdkVersion { get; set; }
     public required string UbuntuSuffix { get; set; }
-    public string? UbuntuPreRelease { get; set; }
+    public string? UbuntuPreReleaseSuffix { get; set; }
 
     private DotnetPackageVersion()
     { }
@@ -83,7 +84,7 @@ public class DotnetPackageVersion
         var packageVersion = new DotnetPackageVersion
         {
             SourcePackageName = sourcePackageName,
-            SourcePackageVersionString = sourcePackageVersion,
+            SourcePackageVersion = sourcePackageVersion,
             UpstreamRuntimeVersion = upstreamRuntimeVersion,
             UpstreamSdkVersion = upstreamSdkVersion,
             UbuntuSuffix = parsedVersion.Groups["UbuntuSuffix"].Value
@@ -91,7 +92,7 @@ public class DotnetPackageVersion
 
         if (parsedVersion.Groups["UbuntuPreRelease"].Success)
         {
-            packageVersion.UbuntuPreRelease = parsedVersion.Groups["UbuntuPreRelease"].Value;
+            packageVersion.UbuntuPreReleaseSuffix = parsedVersion.Groups["UbuntuPreRelease"].Value;
         }
 
         return packageVersion;
@@ -134,10 +135,10 @@ public class DotnetPackageVersion
 
         sb.Append('-');
         sb.Append(UbuntuSuffix);
-        if (UbuntuPreRelease is not null)
+        if (UbuntuPreReleaseSuffix is not null)
         {
             sb.Append('~');
-            sb.Append(UbuntuPreRelease);
+            sb.Append(UbuntuPreReleaseSuffix);
         }
 
         return sb.ToString();
@@ -160,10 +161,10 @@ public class DotnetPackageVersion
 
         sb.Append('-');
         sb.Append(UbuntuSuffix);
-        if (UbuntuPreRelease is not null)
+        if (UbuntuPreReleaseSuffix is not null)
         {
             sb.Append('~');
-            sb.Append(UbuntuPreRelease);
+            sb.Append(UbuntuPreReleaseSuffix);
         }
 
         return sb.ToString();
