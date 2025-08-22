@@ -12,8 +12,7 @@ public static class Program
     private const string MicrosoftReleasesUrl =
         "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json";
 
-    private static DirectoryInfo WorkingDirectory;
-
+    private static DirectoryInfo? _workingDirectory;
     private static ILogger? _logger;
 
     private static async Task<int> Main(string[] args)
@@ -39,19 +38,19 @@ public static class Program
         var workingDirectoryPath = args.ElementAtOrDefault(1);
         if (string.IsNullOrWhiteSpace(workingDirectoryPath))
         {
-            WorkingDirectory = Directory.CreateTempSubdirectory("releases-file-generator-");
+            _workingDirectory = Directory.CreateTempSubdirectory("releases-file-generator-");
         }
         else
         {
-            WorkingDirectory = new DirectoryInfo(workingDirectoryPath);
-            if (!WorkingDirectory.Exists)
+            _workingDirectory = new DirectoryInfo(workingDirectoryPath);
+            if (!_workingDirectory.Exists)
             {
-                WorkingDirectory.Create();
+                _workingDirectory.Create();
             }
         }
 
         _logger.LogInformation("Generating releases file for series {Series}", series);
-        _logger.LogInformation("Using working directory {Path}", WorkingDirectory.FullName);
+        _logger.LogInformation("Using working directory {Path}", _workingDirectory.FullName);
 
         var manifest = await File.ReadAllTextAsync($"Manifests/{series}.json");
         var currentlyAvailableVersions = JsonSerializer.Deserialize<List<AvailableVersionEntry>>(manifest);
@@ -71,7 +70,7 @@ public static class Program
         var distroSeries = await distribution.GetSeriesAsync(new GetSeriesOptions(series));
 
         await ReleaseIndexGenerator.Generate(
-            WorkingDirectory,
+            _workingDirectory,
             currentlyAvailableVersions.AsReadOnly(),
             ubuntuArchive,
             distroSeries,

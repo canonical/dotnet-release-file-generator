@@ -5,7 +5,6 @@ using ReleasesFileGenerator.Launchpad.Types.Models;
 using ReleasesFileGenerator.Launchpad.Types.Options.Archive;
 using ReleasesFileGenerator.Launchpad.Types.Options.BinaryPackagePublishingHistory;
 using ReleasesFileGenerator.Types;
-using Spectre.Console;
 
 namespace ReleasesFileGenerator.Console.Helpers;
 
@@ -89,54 +88,18 @@ public static class ArchiveActions
     /// <returns>
     /// A tuple containing the .NET runtime version, ASP.NET Core runtime version, and SDK version.
     /// </returns>
-    public static async Task<(DotnetVersion RuntimeVersion, DotnetVersion AspNetRuntimeVersion, DotnetVersion SdkVersion)> ReadVersionFromDotVersionFiles(
-        BinaryPackageFile runtimePackageFile,
-        BinaryPackageFile aspnetCoreRuntimePackageFile,
-        BinaryPackageFile sdkPackageFile,
-        DirectoryInfo workingDirectory,
-        bool shouldDeleteFiles = true)
+    public static Task<(DotnetVersion RuntimeVersion, DotnetVersion AspNetRuntimeVersion, DotnetVersion SdkVersion)>
+        ReadVersionFromDotVersionFiles(
+            BinaryPackageFile runtimePackageFile,
+            BinaryPackageFile aspnetCoreRuntimePackageFile,
+            BinaryPackageFile sdkPackageFile,
+            DirectoryInfo workingDirectory,
+            bool shouldDeleteFiles = true)
     {
-        var runtimePackagePath = $"{workingDirectory.FullName}/{runtimePackageFile.Url.Segments.Last()}";
-        var aspNetCoreRuntimePackagePath =
-            $"{workingDirectory.FullName}/{aspnetCoreRuntimePackageFile.Url.Segments.Last()}";
-        var sdkPackagePath = $"{workingDirectory.FullName}/{sdkPackageFile.Url.Segments.Last()}";
-
-        await AnsiConsole.Progress()
-            .HideCompleted(true)
-            .Columns(
-                new TaskDescriptionColumn(),
-                new ProgressBarColumn(),
-                new PercentageColumn(),
-                new RemainingTimeColumn(),
-                new SpinnerColumn(),
-                new DownloadedColumn(),
-                new TransferSpeedColumn())
-            .StartAsync(async ctx =>
-            {
-                var runtimeDownloadProgressTask =
-                    ctx.AddTask(".NET Runtime", autoStart: true, maxValue: runtimePackageFile.Size!.Value);
-                var aspnetCoreRuntimeDownloadProgressTask =
-                    ctx.AddTask("ASP.NET Core Runtime", autoStart: true, maxValue: aspnetCoreRuntimePackageFile.Size!.Value);
-                var sdkDownloadProgressTask =
-                    ctx.AddTask(".NET SDK", autoStart: true, maxValue: sdkPackageFile.Size!.Value);
-
-                var runtimeDownloadTask = FileDownloader.DownloadFileAsync(runtimePackageFile.Url,
-                    workingDirectory.FullName, new Progress<double>(percent =>
-                        runtimeDownloadProgressTask.Increment(percent)));
-                var aspnetCoreRuntimeDownloadTask = FileDownloader.DownloadFileAsync(aspnetCoreRuntimePackageFile.Url,
-                    workingDirectory.FullName, new Progress<double>(percent =>
-                        aspnetCoreRuntimeDownloadProgressTask.Increment(percent)));
-                var sdkDownloadTask = FileDownloader.DownloadFileAsync(sdkPackageFile.Url,
-                    workingDirectory.FullName, new Progress<double>(percent =>
-                        sdkDownloadProgressTask.Increment(percent)));
-
-                await Task.WhenAll(runtimeDownloadTask, aspnetCoreRuntimeDownloadTask, sdkDownloadTask);
-            });
-
-        return ReadVersionsFromDotVersionFiles(
-            runtimePackagePath,
-            aspNetCoreRuntimePackagePath,
-            sdkPackagePath,
+        return ReadVersionFromDotVersionFiles(
+            runtimePackageFile.Url,
+            aspnetCoreRuntimePackageFile.Url,
+            sdkPackageFile.Url,
             workingDirectory,
             shouldDeleteFiles);
     }
@@ -164,35 +127,26 @@ public static class ArchiveActions
             DirectoryInfo workingDirectory,
             bool shouldDeleteFiles = true)
     {
-        var runtimePackagePath = $"{workingDirectory.FullName}/{runtimePackageFileUrl.Segments.Last()}";
+        var runtimePackagePath =
+            $"{workingDirectory.FullName}/{runtimePackageFileUrl.Segments.Last()}";
         var aspNetCoreRuntimePackagePath =
             $"{workingDirectory.FullName}/{aspnetCoreRuntimePackageFileUrl.Segments.Last()}";
-        var sdkPackagePath = $"{workingDirectory.FullName}/{sdkPackageFileUrl.Segments.Last()}";
+        var sdkPackagePath =
+            $"{workingDirectory.FullName}/{sdkPackageFileUrl.Segments.Last()}";
 
-        await AnsiConsole.Status()
-            .StartAsync("Downloading .NET Runtime", async ctx =>
-            {
-                if (!File.Exists(runtimePackagePath))
-                {
-                    await FileDownloader.DownloadFileAsync(runtimePackageFileUrl, workingDirectory.FullName);
-                }
-            });
-        await AnsiConsole.Status()
-            .StartAsync("Downloading ASP.NET Core Runtime", async ctx =>
-            {
-                if (!File.Exists(aspNetCoreRuntimePackagePath))
-                {
-                    await FileDownloader.DownloadFileAsync(aspnetCoreRuntimePackageFileUrl, workingDirectory.FullName);
-                }
-            });
-        await AnsiConsole.Status()
-            .StartAsync("Downloading .NET SDK", async ctx =>
-            {
-                if (!File.Exists(sdkPackagePath))
-                {
-                    await FileDownloader.DownloadFileAsync(sdkPackageFileUrl, workingDirectory.FullName);
-                }
-            });
+        var runtimeDownloadTask = File.Exists(runtimePackagePath)
+            ? Task.FromResult(true)
+            : FileDownloader.DownloadFileAsync(runtimePackageFileUrl, workingDirectory.FullName);
+
+        var aspNetCoreRuntimeDownloadTask = File.Exists(aspNetCoreRuntimePackagePath)
+            ? Task.FromResult(true)
+            : FileDownloader.DownloadFileAsync(aspnetCoreRuntimePackageFileUrl, workingDirectory.FullName);
+
+        var sdkDownloadTask = File.Exists(sdkPackagePath)
+            ? Task.FromResult(true)
+            : FileDownloader.DownloadFileAsync(sdkPackageFileUrl, workingDirectory.FullName);
+
+        await Task.WhenAll(runtimeDownloadTask, aspNetCoreRuntimeDownloadTask, sdkDownloadTask);
 
         return ReadVersionsFromDotVersionFiles(
             runtimePackagePath,
