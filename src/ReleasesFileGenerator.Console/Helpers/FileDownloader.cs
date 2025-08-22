@@ -1,43 +1,42 @@
+using System.Diagnostics;
+
 namespace ReleasesFileGenerator.Console.Helpers;
 
 public static class FileDownloader
 {
-    public static async Task DownloadFileAsync(Uri fileUrl, string destinationPath, IProgress<double>? progress = null,
-        CancellationToken cancellationToken = default)
+    public static Task<bool> DownloadFileAsync(
+        Uri fileUrl, string destinationPath, CancellationToken cancellationToken = default)
     {
-        using var httpClient = new HttpClient();
-        using var response = await httpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
+        const string wgetExecutable = "/usr/bin/wget";
 
-        response.EnsureSuccessStatusCode();
-
-        var destinationFile = Path.Join(destinationPath, fileUrl.Segments[^1]);
-
-        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        await using var fileStream =
-            new FileStream(destinationFile, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
-
-        var buffer = new byte[8192];
-        var moreToRead = true;
-
-        do
+        if (!File.Exists(wgetExecutable))
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                File.Delete(destinationFile);
-            }
-
-            var read = await contentStream.ReadAsync(buffer, cancellationToken);
-            if (read == 0)
-            {
-                moreToRead = false;
-                continue;
-            }
-
-            await fileStream.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
-
-            progress?.Report(read);
+            throw new FileNotFoundException("wget executable not found.", wgetExecutable);
         }
-        while (moreToRead);
+
+        var processStartInfo = new ProcessStartInfo
+        {
+            FileName = wgetExecutable,
+            Arguments = $"--continue \"{fileUrl}\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = destinationPath
+        };
+
+        return Task.Run(() =>
+        {
+            var process = Process.Start(processStartInfo);
+
+            if (process is null)
+            {
+                throw new ApplicationException("Could not start the dpkg process.");
+            }
+
+            process.WaitForExit();
+
+            return process.ExitCode == 0;
+        }, cancellationToken);
     }
 }
