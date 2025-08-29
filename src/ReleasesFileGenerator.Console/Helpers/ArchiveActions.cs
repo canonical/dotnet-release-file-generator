@@ -134,19 +134,8 @@ public static class ArchiveActions
         var sdkPackagePath =
             $"{workingDirectory.FullName}/{sdkPackageFileUrl.Segments.Last()}";
 
-        var runtimeDownloadTask = File.Exists(runtimePackagePath)
-            ? Task.FromResult(true)
-            : FileDownloader.DownloadFileAsync(runtimePackageFileUrl, workingDirectory.FullName);
-
-        var aspNetCoreRuntimeDownloadTask = File.Exists(aspNetCoreRuntimePackagePath)
-            ? Task.FromResult(true)
-            : FileDownloader.DownloadFileAsync(aspnetCoreRuntimePackageFileUrl, workingDirectory.FullName);
-
-        var sdkDownloadTask = File.Exists(sdkPackagePath)
-            ? Task.FromResult(true)
-            : FileDownloader.DownloadFileAsync(sdkPackageFileUrl, workingDirectory.FullName);
-
-        await Task.WhenAll(runtimeDownloadTask, aspNetCoreRuntimeDownloadTask, sdkDownloadTask);
+        await FileDownloader.DownloadFileAsync(workingDirectory.FullName, CancellationToken.None,
+            runtimePackageFileUrl, aspnetCoreRuntimePackageFileUrl, sdkPackageFileUrl);
 
         return ReadVersionsFromDotVersionFiles(
             runtimePackagePath,

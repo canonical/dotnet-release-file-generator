@@ -1,42 +1,66 @@
-using System.Diagnostics;
+using Downloader;
+using Spectre.Console;
 
 namespace ReleasesFileGenerator.Console.Helpers;
 
 public static class FileDownloader
 {
-    public static Task<bool> DownloadFileAsync(
-        Uri fileUrl, string destinationPath, CancellationToken cancellationToken = default)
+    public static Task DownloadFileAsync(string destinationDirectory, CancellationToken cancellationToken,
+        params Uri[] fileUrls)
     {
-        const string wgetExecutable = "/usr/bin/wget";
-
-        if (!File.Exists(wgetExecutable))
-        {
-            throw new FileNotFoundException("wget executable not found.", wgetExecutable);
-        }
-
-        var processStartInfo = new ProcessStartInfo
-        {
-            FileName = wgetExecutable,
-            Arguments = $"--continue \"{fileUrl}\"",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WorkingDirectory = destinationPath
-        };
-
-        return Task.Run(() =>
-        {
-            var process = Process.Start(processStartInfo);
-
-            if (process is null)
+        return AnsiConsole
+            .Progress()
+            .Columns(
+                new TaskDescriptionColumn(),
+                new ProgressBarColumn(),
+                new PercentageColumn(),
+                new RemainingTimeColumn(),
+                new SpinnerColumn(),
+                new DownloadedColumn(),
+                new TransferSpeedColumn())
+            .StartAsync(async ctx =>
             {
-                throw new ApplicationException("Could not start the dpkg process.");
-            }
+                var tasks = new List<Task>();
 
-            process.WaitForExit();
+                foreach (var fileUrl in fileUrls)
+                {
+                    var fileName = fileUrl.Segments.Last();
+                    var destination = Path.Join(destinationDirectory, fileName);
 
-            return process.ExitCode == 0;
-        }, cancellationToken);
+                    if (File.Exists(destination))
+                    {
+                        continue;
+                    }
+
+                    var download = DownloadBuilder.New()
+                        .WithUrl(fileUrl)
+                        .WithFileLocation(destination)
+                        .WithConfiguration(new DownloadConfiguration
+                        {
+                            ClearPackageOnCompletionWithFailure = true
+                        })
+                        .Build();
+
+                    var progressTask = ctx.AddTask(fileName);
+
+                    download.DownloadProgressChanged += (s, e) =>
+                    {
+                        progressTask.Increment(e.ProgressedByteSize);
+                    };
+
+                    download.DownloadStarted += (s, e) => progressTask.MaxValue(e.TotalBytesToReceive);
+
+                    tasks.Add(download.StartAsync(cancellationToken));
+
+                    progressTask.StartTask();
+                }
+
+                await Task.WhenAll(tasks);
+
+                if (tasks.Any(t => t.IsFaulted))
+                {
+                    throw new ApplicationException("One or more downloads failed.");
+                }
+            });
     }
 }

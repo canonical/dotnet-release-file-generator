@@ -20,7 +20,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Downloader" Version="4.0.3" />
       <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.8" />
+      <PackageReference Include="Spectre.Console.Cli" Version="0.50.0" />
     </ItemGroup>
 
 </Project>
