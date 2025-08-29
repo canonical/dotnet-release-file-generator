@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Flamenco.Packaging.Dpkg\Flamenco.Packaging.Dpkg.csproj" />
       <ProjectReference Include="..\ReleasesFileGenerator.Launchpad\ReleasesFileGenerator.Launchpad.csproj" />
       <ProjectReference Include="..\ReleasesFileGenerator.Types\ReleasesFileGenerator.Types.csproj" />
     </ItemGroup>
