@@ -16,7 +16,7 @@ public class Release
     public bool Security { get; set; }
 
     [JsonPropertyName("cve-list")]
-    public IEnumerable<Cve>? CveList { get; set; }
+    public IEnumerable<Cve>? CveList { get; set; } = [];
 
     [JsonPropertyName("release-notes")]
     public Uri? ReleaseNotes { get; set; }

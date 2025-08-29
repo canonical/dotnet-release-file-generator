@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using Flamenco.Packaging.Dpkg;
 using Microsoft.Extensions.Logging;
 using ReleasesFileGenerator.Console.Helpers;
 using ReleasesFileGenerator.Console.Models;
@@ -11,6 +13,8 @@ namespace ReleasesFileGenerator.Console;
 
 public static class ReleaseHistoryGenerator
 {
+    private static readonly HttpClient HttpClient = new();
+
     public static async Task Generate(
         DirectoryInfo workingDirectory,
         AvailableVersionEntry versionEntry,
@@ -180,6 +184,28 @@ public static class ReleaseHistoryGenerator
                         VersionDisplay = versions.RuntimeVersion.ToString()
                     }
                 };
+            }
+
+            // If security release, analyze changelog for CVE numbers
+            if (release.Security)
+            {
+                var changelogUrl = await sourcePackage.GetChangelogUrl();
+                var changelogRequest = await HttpClient.GetStringAsync(changelogUrl);
+
+                using var changelogReader = new DpkgChangelogReader(new StringReader(changelogRequest));
+
+                var entry = await changelogReader.ReadChangelogEntryAsync();
+                if (entry is { HasValue: true, Value: not null })
+                {
+                    var cvePattern = @"CVE-\d{4}-\d{4,7}";
+                    var cveMatches = Regex.Matches(entry.Value.Value.Description, cvePattern, RegexOptions.IgnoreCase);
+                    var cveNumbers = cveMatches.Select(m => Cve.Parse(m.Value, null)).Distinct().ToArray();
+
+                    if (cveNumbers.Any())
+                    {
+                        release.CveList = cveNumbers;
+                    }
+                }
             }
 
             channelDetailsReleases.Add(release);
