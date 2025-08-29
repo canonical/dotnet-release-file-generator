@@ -36,6 +36,15 @@ public static class ReleaseIndexGenerator
             logger = loggerFactory.CreateLogger(nameof(ReleaseIndexGenerator));
         }
 
+        // Get releases.json URL origin from the environment variable, if defined.
+        var urlOrigin = Environment.GetEnvironmentVariable("RELEASES_JSON_URL_ORIGIN");
+        if (string.IsNullOrWhiteSpace(urlOrigin))
+        {
+            urlOrigin = workingDirectory.FullName;
+        }
+
+        logger?.LogInformation("Using releases.json URL origin: {UrlOrigin}", urlOrigin);
+
         var index = new List<Channel>();
         foreach (var version in availableVersions)
         {
@@ -53,7 +62,7 @@ public static class ReleaseIndexGenerator
                 LatestRelease = DotnetVersion.Parse("1.0.0"),
                 LatestSdk = DotnetVersion.Parse("1.0.0"),
                 LatestRuntime = DotnetVersion.Parse("1.0.0"),
-                ReleasesJsonUrl = new Uri("https://not-a-url.com")
+                ReleasesJsonUrl = new Uri($"{urlOrigin}/{version.ChannelVersion}/releases.json", UriKind.Absolute)
             };
 
             var publishedSources =
