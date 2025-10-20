@@ -52,7 +52,12 @@ public static class Program
         _logger.LogInformation("Generating releases file for series {Series}", series);
         _logger.LogInformation("Using working directory {Path}", _workingDirectory.FullName);
 
-        var manifest = await File.ReadAllTextAsync($"Manifests/{series}.json");
+        var executablePath = Environment.ProcessPath;
+        var manifestsDirLocation = Path.Combine(
+            Path.GetDirectoryName(executablePath) ?? string.Empty,
+            "Manifests");
+
+        var manifest = await File.ReadAllTextAsync(Path.Combine(manifestsDirLocation, $"{series}.json"));
         var currentlyAvailableVersions = JsonSerializer.Deserialize<List<AvailableVersionEntry>>(manifest);
 
         if (currentlyAvailableVersions is null)
