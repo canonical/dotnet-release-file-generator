@@ -1,0 +1,13 @@
+[
+  {
+    "channel-version": "8.0",
+    "product": ".NET",
+    "support-phase": "active",
+    "release-type": "lts",
+    "eol-date": "2026-11-10",
+    "source-package-name": "dotnet8",
+    "runtime-binary-package-name": "dotnet-runtime-8.0",
+    "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-8.0",
+    "sdk-binary-package-name": "dotnet-sdk-8.0"
+  }
+]
