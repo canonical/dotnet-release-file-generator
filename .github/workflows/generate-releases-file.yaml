@@ -39,7 +39,7 @@ jobs:
       - name: Generate releases matrix
         id: generate-matrix
         run:
-          releases_array=$(ls ./dist/Manifests | sed 's/\.[^.]*$//' | jq -raw-input . | jq --slurp .)
+          releases_array=$(ls ./dist/Manifests | sed 's/\.[^.]*$//' | jq --raw-input . | jq --slurp .)
           echo "releases=$releases_array" >> $GITHUB_OUTPUT
 
   generate-releases-file:
