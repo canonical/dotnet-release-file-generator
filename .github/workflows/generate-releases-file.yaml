@@ -59,7 +59,7 @@ jobs:
         id: generate-releases-file
         run: |
           scratch_dir=$(mktemp -d)
-          ./dist/ReleasesFileGenerator.Console ${{ matrix.release }} $scratch_dir
+          ./ReleasesFileGenerator.Console ${{ matrix.release }} $scratch_dir
           echo "scratch_dir=$scratch_dir" >> $GITHUB_OUTPUT
 
       - name: Commit releases files
