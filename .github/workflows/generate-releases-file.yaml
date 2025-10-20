@@ -65,7 +65,7 @@ jobs:
       - name: Generate releases file
         id: generate-releases-file
         env:
-          RELEASES_JSON_URL_ORIGIN: ${RELEASES_JSON_URL_BASE}/release/${{ matrix.release }}
+          RELEASES_JSON_URL_ORIGIN: ${{ env.RELEASES_JSON_URL_BASE }}/release/${{ matrix.release }}
         run: |
           scratch_dir=$(mktemp -d)
           chmod a+x ${{ steps.download-artifact.outputs.download-path }}/ReleasesFileGenerator.Console
