@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: '0 0 * * 1-5'
+  workflow_dispatch:
 
 env:
   RELEASES_JSON_URL_BASE: https://raw.githubusercontent.com/canonical/dotnet-release-file-generator/refs/heads
