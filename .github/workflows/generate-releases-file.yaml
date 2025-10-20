@@ -1,0 +1,79 @@
+name: Generate Releases File
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-releases-file-generator:
+    runs-on: ubuntu-latest
+    outputs:
+      releases: ${{ steps.generate-matrix.outputs.releases }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install .NET
+        run: |
+          sudo add-apt-repository --yes ppa:dotnet/backports
+          sudo apt install --yes dotnet9
+
+      - name: Build Releases File Generator
+        run: |
+          dotnet publish src/ReleasesFileGenerator.Console/ReleasesFileGenerator.Console.csproj \
+            --configuration Release \
+            --runtime linux-x64 \
+            --self-contained \
+            --output ./dist \
+            --property:PublishSingleFile=true
+          # Remove unnecessary debug files
+          rm ./dist/*.pdb
+
+      - name: Upload Releases File Generator artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: releases-file-generator
+          path: ./dist
+
+      - name: Generate releases matrix
+        id: generate-matrix
+        run:
+          releases_array=$(ls ./dist/Manifests | sed 's/\.[^.]*$//' | jq -raw-input . | jq --slurp .)
+          echo "releases=$releases_array" >> $GITHUB_OUTPUT
+
+  generate-releases-file:
+    needs: build-releases-file-generator
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        release: ${{ fromJson(needs.build-releases-file-generator.outputs.releases) }}
+    steps:
+      - name: Download Releases File Generator artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: releases-file-generator
+
+      - name: Generate releases file
+        id: generate-releases-file
+        run: |
+          scratch_dir=$(mktemp -d)
+          ./dist/ReleasesFileGenerator.Console ${{ matrix.release }} $scratch_dir
+          echo "scratch_dir=$scratch_dir" >> $GITHUB_OUTPUT
+
+      - name: Commit releases files
+        run: |
+          cd ${{ steps.generate-releases-file.outputs.scratch_dir }}
+          git init
+          git add -A
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m '${{ matrix.release }} releases file update'
+
+      - name: Push to GH Pages branch
+        uses: ad-m/github-push-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/${{ matrix.release }}
+          force: true
+          directory: ${{ steps.generate-releases-file.outputs.scratch_dir }}
