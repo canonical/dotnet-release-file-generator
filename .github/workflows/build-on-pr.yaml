@@ -1,0 +1,27 @@
+name: Build .NET solution on PR to main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install .NET
+        run: |
+          sudo add-apt-repository --yes ppa:dotnet/backports
+          sudo apt install --yes dotnet9
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Debug
+
+      - name: Run tests
+        run: dotnet test --no-build --configuration Debug --verbosity normal
