@@ -211,6 +211,15 @@ public static class ReleaseHistoryGenerator
             channelDetailsReleases.Add(release);
         }
 
+        var latestReleaseDate = channelDetailsReleases
+            .MaxBy(r => r.ReleaseDate)?
+            .ReleaseDate;
+
+        if (latestReleaseDate is not null)
+        {
+            channelDetails.LatestReleaseDate = latestReleaseDate.Value;
+        }
+
         var releaseDirectory = Directory.CreateDirectory(Path.Join(workingDirectory.FullName, channel.ChannelVersion));
         var filePath = Path.Join(releaseDirectory.FullName, "releases.json");
         await File.WriteAllTextAsync(
