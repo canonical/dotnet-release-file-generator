@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  RELEASES_JSON_URL_BASE: https://raw.githubusercontent.com/canonical/dotnet-release-file-generator/refs/heads
+
 jobs:
   build-releases-file-generator:
     runs-on: ubuntu-latest
@@ -58,6 +61,8 @@ jobs:
 
       - name: Generate releases file
         id: generate-releases-file
+        env:
+          RELEASES_JSON_URL_ORIGIN: ${RELEASES_JSON_URL_BASE}/release/${{ matrix.release }}
         run: |
           scratch_dir=$(mktemp -d)
           chmod a+x ${{ steps.download-artifact.outputs.download-path }}/ReleasesFileGenerator.Console

@@ -9,9 +9,6 @@ namespace ReleasesFileGenerator.Console;
 
 public static class Program
 {
-    private const string MicrosoftReleasesUrl =
-        "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json";
-
     private static DirectoryInfo? _workingDirectory;
     private static ILogger? _logger;
 
