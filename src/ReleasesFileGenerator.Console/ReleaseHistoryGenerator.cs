@@ -152,7 +152,7 @@ public static class ReleaseHistoryGenerator
                     aspNetCoreRuntimePackageFileUrl,
                     sdkPackageFileUrl,
                     workingDirectory,
-                    shouldDeleteFiles: false);
+                    shouldDeleteFiles: true);
 
                 release = new Release
                 {
