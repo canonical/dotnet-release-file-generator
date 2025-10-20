@@ -60,6 +60,8 @@ jobs:
         id: generate-releases-file
         run: |
           scratch_dir=$(mktemp -d)
+          chmod a+x ${{ steps.download-artifact.outputs.download-path }}/ReleasesFileGenerator.Console
+          tree -p ${{ steps.download-artifact.outputs.download-path }}
           ${{ steps.download-artifact.outputs.download-path }}/ReleasesFileGenerator.Console ${{ matrix.release }} $scratch_dir
           echo "scratch_dir=$scratch_dir" >> $GITHUB_OUTPUT
 
