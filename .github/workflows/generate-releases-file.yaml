@@ -51,6 +51,7 @@ jobs:
         release: ${{ fromJson(needs.build-releases-file-generator.outputs.releases) }}
     steps:
       - name: Download Releases File Generator artifact
+        id: download-artifact
         uses: actions/download-artifact@v5
         with:
           name: releases-file-generator
@@ -59,7 +60,7 @@ jobs:
         id: generate-releases-file
         run: |
           scratch_dir=$(mktemp -d)
-          ./ReleasesFileGenerator.Console ${{ matrix.release }} $scratch_dir
+          ${{ steps.download-artifact.outputs.download-path }}/ReleasesFileGenerator.Console ${{ matrix.release }} $scratch_dir
           echo "scratch_dir=$scratch_dir" >> $GITHUB_OUTPUT
 
       - name: Commit releases files
