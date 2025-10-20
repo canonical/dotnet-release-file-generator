@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ReleasesFileGenerator.Launchpad.Types;
+namespace ReleasesFileGenerator.Launchpad.Types.Models;
 
 public class BinaryPackageFile
 {

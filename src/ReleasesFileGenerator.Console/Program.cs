@@ -1,207 +1,81 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using ReleasesFileGenerator.Console.Models;
 using ReleasesFileGenerator.Launchpad.Collections;
 using ReleasesFileGenerator.Launchpad.Collections.Options.Archives;
-using ReleasesFileGenerator.Launchpad.Types;
-using ReleasesFileGenerator.Launchpad.Types.Enums;
-using ReleasesFileGenerator.Launchpad.Types.Options.Archive;
-using ReleasesFileGenerator.Launchpad.Types.Options.BinaryPackagePublishingHistory;
-using ReleasesFileGenerator.Types;
-using ReleasesFileGenerator.Types.ReleasesFile;
+using ReleasesFileGenerator.Launchpad.Types.Options.Distribution;
 
 namespace ReleasesFileGenerator.Console;
 
-public class Program
+public static class Program
 {
     private const string MicrosoftReleasesUrl =
         "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json";
 
-    private static void Main(string[] args)
+    private static DirectoryInfo? _workingDirectory;
+    private static ILogger? _logger;
+
+    private static async Task<int> Main(string[] args)
     {
-        var workingDirectory = Directory.CreateTempSubdirectory("releases-file-generator-");
-        var currentlyAvailableVersions = AvailableVersions.GetAvailableVersions();
-
-        var ubuntuArchive = Archives.GetByReference(GetByReferenceOptions.Ubuntu).Result;
-
-        var index = new List<Channel>();
-        foreach (var version in currentlyAvailableVersions)
+        #region Logging
+        using var loggerFactory = LoggerFactory.Create(builder =>
         {
-            var channel = new Channel
+            builder.AddConsole(options =>
             {
-                ChannelVersion = version.ChannelVersion,
-                Product = version.Product,
-                SupportPhase = version.SupportPhase,
-                ReleaseType = version.ReleaseType,
-                EolDate = version.EolDate,
+                options.LogToStandardErrorThreshold = LogLevel.Error;
+            });
+        });
+        _logger = loggerFactory.CreateLogger(nameof(Program));
+        #endregion
 
-                LatestRelease = DotnetVersion.Parse("1.0.0"),
-                LatestSdk = DotnetVersion.Parse("1.0.0"),
-                LatestRuntime = DotnetVersion.Parse("1.0.0"),
-                ReleasesJsonUrl = new Uri("https://not-a-url.com")
-            };
+        var series = args.ElementAtOrDefault(0);
+        if (string.IsNullOrWhiteSpace(series))
+        {
+            _logger.LogError("No series provided.");
+            return -1;
+        }
 
-            var publishedSources = new List<SourcePackagePublishingHistory>();
-            var currentPageOfPublishedSources = ubuntuArchive.GetPublishedSourcesAsync(new GetPublishedSourcesOptions
+        var workingDirectoryPath = args.ElementAtOrDefault(1);
+        if (string.IsNullOrWhiteSpace(workingDirectoryPath))
+        {
+            _workingDirectory = Directory.CreateTempSubdirectory("releases-file-generator-");
+        }
+        else
+        {
+            _workingDirectory = new DirectoryInfo(workingDirectoryPath);
+            if (!_workingDirectory.Exists)
             {
-                SourcePackageName = version.SourcePackageName
-            }).Result;
-
-            do
-            {
-                publishedSources.AddRange(currentPageOfPublishedSources.Entries);
-                currentPageOfPublishedSources = currentPageOfPublishedSources.GetNextPageAsync().Result;
-            } while (currentPageOfPublishedSources is not null);
-
-            System.Console.WriteLine($"Found {publishedSources.Count} published sources for {version.SourcePackageName}");
-
-            var uniquePublishedSources = publishedSources
-                .Where(s => s.Status is ArchivePublishingStatus.Published or ArchivePublishingStatus.Superseded)
-                .DistinctBy(s =>
-                {
-                    var localVersion = DotnetPackageVersion.Create(s.SourcePackageName, s.SourcePackageVersion);
-                    return (localVersion.UpstreamRuntimeVersion, localVersion.UpstreamSdkVersion);
-                });
-
-            var sourceOfInterest = uniquePublishedSources
-                .MaxBy(s => s.DatePublished);
-
-            if (sourceOfInterest is null)
-            {
-                throw new ApplicationException("Could not determine latest published version.");
+                _workingDirectory.Create();
             }
-
-            var localVersion = DotnetPackageVersion.Create(sourceOfInterest.SourcePackageName,
-                sourceOfInterest.SourcePackageVersion);
-
-            System.Console.WriteLine(
-                $"Analyzing source {sourceOfInterest.SourcePackageName} [{sourceOfInterest.SourcePackageVersion}]");
-
-            var runtimePackagesTask = ubuntuArchive.GetPublishedBinariesAsync(new GetPublishedBinariesOptions
-            {
-                BinaryPackageName = version.RuntimeBinaryPackageName,
-                Version = localVersion.GetUbuntuRuntimePackageVersion() ?? localVersion.GetUbuntuSdkPackageVersion(),
-                ExactMatch = true
-            });
-
-            var sdkPackagesTask = ubuntuArchive.GetPublishedBinariesAsync(new GetPublishedBinariesOptions
-            {
-                BinaryPackageName = version.SdkBinaryPackageName,
-                Version = localVersion.GetUbuntuSdkPackageVersion(),
-                ExactMatch = true
-            });
-
-            Task.WaitAll(runtimePackagesTask, sdkPackagesTask);
-
-            var runtimePackage = runtimePackagesTask.Result.Entries
-                .First(p => p.DisplayName.Contains("amd64"));
-            var sdkPackage = sdkPackagesTask.Result.Entries
-                .First(p => p.DisplayName.Contains("amd64"));
-
-            var runtimePackageFilesTask = runtimePackage.GetBinaryPackageFiles(new GetBinaryPackageFilesOptions
-            {
-                IncludeMetadata = true
-            });
-            var sdkPackageFilesTask = sdkPackage.GetBinaryPackageFiles(new GetBinaryPackageFilesOptions
-            {
-                IncludeMetadata = true
-            });
-
-            Task.WaitAll(runtimePackageFilesTask, sdkPackageFilesTask);
-
-            var runtimePackageFile = runtimePackageFilesTask.Result.First();
-            var sdkPackageFile = sdkPackageFilesTask.Result.First();
-
-            var runtimeDownloadProgress = new Progress<double>(percent =>
-                System.Console.WriteLine($"[Runtime] Downloaded {percent:F2}%"));
-            var runtimeDownloadTask = FileDownloader.DownloadFileAsync(runtimePackageFile.Url,
-                workingDirectory.FullName, runtimeDownloadProgress);
-
-            var sdkDownloadProgress = new Progress<double>(percent =>
-                System.Console.WriteLine($"[SDK] Downloaded {percent:F2}%"));
-            var sdkDownloadTask = FileDownloader.DownloadFileAsync(sdkPackageFile.Url,
-                workingDirectory.FullName, sdkDownloadProgress);
-
-            Task.WaitAll(runtimeDownloadTask, sdkDownloadTask);
-
-            ExtractDebFile($"{workingDirectory.FullName}/{runtimePackageFile.Url.Segments.Last()}",
-                workingDirectory.FullName);
-            ExtractDebFile($"{workingDirectory.FullName}/{sdkPackageFile.Url.Segments.Last()}",
-                workingDirectory.FullName);
-
-            channel.LatestRelease =
-                DotnetVersion.Parse(
-                    DotVersionFile.Parse(
-                        FindDotVersionFile($"{workingDirectory.FullName}/usr/lib/dotnet/shared/Microsoft.NETCore.App"))
-                        .Version);
-            channel.LatestRuntime =
-                DotnetVersion.Parse(
-                    DotVersionFile.Parse(
-                        FindDotVersionFile($"{workingDirectory.FullName}/usr/lib/dotnet/shared/Microsoft.NETCore.App"))
-                        .Version);
-            channel.LatestSdk =
-                DotnetVersion.Parse(
-                    DotVersionFile.Parse(
-                        FindDotVersionFile($"{workingDirectory.FullName}/usr/lib/dotnet/sdk"))
-                        .Version);
-
-            index.Add(channel);
-
-            File.Delete($"{workingDirectory.FullName}/{runtimePackageFile.Url.Segments.Last()}");
-            File.Delete($"{workingDirectory.FullName}/{sdkPackageFile.Url.Segments.Last()}");
-            Directory.Delete(Path.Join(workingDirectory.FullName, "usr"), recursive: true);
         }
 
-        var releasesFile = new Types.ReleasesFile.Index
+        _logger.LogInformation("Generating releases file for series {Series}", series);
+        _logger.LogInformation("Using working directory {Path}", _workingDirectory.FullName);
+
+        var manifest = await File.ReadAllTextAsync($"Manifests/{series}.json");
+        var currentlyAvailableVersions = JsonSerializer.Deserialize<List<AvailableVersionEntry>>(manifest);
+
+        if (currentlyAvailableVersions is null)
         {
-            ReleasesIndex = index
-        };
-
-        File.WriteAllText($"{workingDirectory.FullName}/releases-index.json", JsonSerializer.Serialize(releasesFile));
-
-        return;
-
-        string FindDotVersionFile(string directory)
-        {
-            var files = Directory.GetFiles(directory, ".version", SearchOption.AllDirectories);
-            if (files.Length == 0)
-            {
-                throw new FileNotFoundException("No .version file found in the specified directory.");
-            }
-
-            return files[0];
-        }
-    }
-
-    private static void ExtractDebFile(string filePath, string destinationDirectory)
-    {
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException("The specified .deb file does not exist.", filePath);
+            _logger.LogError("Failed to deserialize available versions.");
+            return -1;
         }
 
-        var processStartInfo = new ProcessStartInfo
-        {
-            FileName = "dpkg",
-            Arguments = $"--extract {filePath} .",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            WorkingDirectory = destinationDirectory
-        };
+        _logger.LogInformation("Found {Count} available versions for series {Series}",
+            currentlyAvailableVersions.Count, series);
 
-        using var process = Process.Start(processStartInfo);
+        var ubuntuArchive = await Archives.GetByReference(GetByReferenceOptions.Ubuntu);
+        var distribution = await ubuntuArchive.GetDistributionAsync();
+        // Get the distribution series based on the provided series name.
+        var distroSeries = await distribution.GetSeriesAsync(new GetSeriesOptions(series));
 
-        if (process is null)
-        {
-            throw new ApplicationException("Could not start the dpkg process.");
-        }
+        await ReleaseIndexGenerator.Generate(
+            _workingDirectory,
+            currentlyAvailableVersions.AsReadOnly(),
+            ubuntuArchive,
+            distroSeries,
+            loggerFactory);
 
-        process.WaitForExit();
-
-        if (process.ExitCode != 0)
-        {
-            var errorMessage = process.StandardError.ReadToEnd();
-            throw new ApplicationException($"dpkg failed with exit code {process.ExitCode}: {errorMessage}");
-        }
+        return 0;
     }
 }

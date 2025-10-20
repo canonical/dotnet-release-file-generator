@@ -8,8 +8,21 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Flamenco.Packaging.Dpkg\Flamenco.Packaging.Dpkg.csproj" />
       <ProjectReference Include="..\ReleasesFileGenerator.Launchpad\ReleasesFileGenerator.Launchpad.csproj" />
       <ProjectReference Include="..\ReleasesFileGenerator.Types\ReleasesFileGenerator.Types.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Manifests\**\*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Downloader" Version="4.0.3" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.8" />
+      <PackageReference Include="Spectre.Console.Cli" Version="0.50.0" />
     </ItemGroup>
 
 </Project>

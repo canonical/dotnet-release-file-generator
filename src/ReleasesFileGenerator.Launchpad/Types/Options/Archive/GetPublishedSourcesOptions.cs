@@ -5,16 +5,47 @@ namespace ReleasesFileGenerator.Launchpad.Types.Options.Archive;
 
 public class GetPublishedSourcesOptions : RequestOptionsBase
 {
+    /// <summary>
+    /// Whether to filter source names by exact matching.
+    /// </summary>
     public bool ExactMatch { get; set; } = false;
+    /// <summary>
+    /// Return newest results first. This is recommended for applications that need to catch up with publications since their last run.
+    /// If not specified, results are ordered by source package name (lexicographically), then by descending version and then descending ID.
+    /// </summary>
     public bool OrderByDate { get; set; } = true;
+    /// <summary>
+    /// Return oldest results first.
+    /// </summary>
     public bool OrderByDateAscending { get; set; } = false;
 
+    /// <summary>
+    /// Component name.
+    /// </summary>
     public string? ComponentName { get; set; } = null;
+    /// <summary>
+    /// Return entries whose <c>date_created</c> is greater than or equal to this date.
+    /// </summary>
     public DateTimeOffset? CreatedSince { get; set; } = null;
+    /// <summary>
+    /// Distro series name.
+    /// </summary>
     public Uri? DistroSeriesLink { get; set; } = null;
+    /// <summary>
+    /// The pocket into which this entry is published.
+    /// </summary>
     public ArchivePocket? Pocket { get; set; } = null;
+    /// <summary>
+    /// Source package name.
+    /// </summary>
     public string? SourcePackageName { get; set; } = null;
+    /// <summary>
+    /// The status of this publishing record.
+    /// </summary>
     public ArchivePublishingStatus? Status { get; set; } = null;
+    /// <summary>
+    /// Version of the source package.
+    /// </summary>
     public string? Version { get; set; } = null;
 
     public static GetPublishedSourcesOptions Empty => new();

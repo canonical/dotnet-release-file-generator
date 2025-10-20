@@ -32,8 +32,11 @@ public class ChannelDetails
     [JsonConverter(typeof(JsonStringEnumConverter<ReleaseType>))]
     public ReleaseType ReleaseType { get; set; }
 
+    [JsonPropertyName("eol-date")]
+    public DateOnly? EolDate { get; set; }
+
     [JsonPropertyName("lifecycle-policy")]
-    public required Uri LifecyclePolicy { get; set; }
+    public Uri? LifecyclePolicy { get; set; }
 
     [JsonPropertyName("releases")]
     public required IEnumerable<Release> Releases { get; set; }

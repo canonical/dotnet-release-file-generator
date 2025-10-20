@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using ReleasesFileGenerator.Launchpad.Models;
 using ReleasesFileGenerator.Launchpad.Types.Enums;
+using ReleasesFileGenerator.Launchpad.Types.Models;
 using ReleasesFileGenerator.Launchpad.Types.Options.BinaryPackagePublishingHistory;
 
 namespace ReleasesFileGenerator.Launchpad.Types;

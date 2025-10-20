@@ -1,6 +1,8 @@
+using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using ReleasesFileGenerator.Launchpad.Models;
 using ReleasesFileGenerator.Launchpad.Types.Enums;
+using ReleasesFileGenerator.Launchpad.Types.Options.SourcePackagePublishingHistory;
 
 namespace ReleasesFileGenerator.Launchpad.Types;
 
@@ -23,7 +25,7 @@ public class SourcePackagePublishingHistory : LaunchpadEntryType
     public required Uri DistroSeriesLink { get; set; }
 
     [JsonPropertyName("date_published")]
-    public DateTimeOffset DatePublished { get; set; }
+    public DateTimeOffset? DatePublished { get; set; }
 
     [JsonPropertyName("scheduled_deletion_date")]
     public DateTimeOffset? ScheduledDeletionDate { get; set; }
@@ -79,4 +81,42 @@ public class SourcePackagePublishingHistory : LaunchpadEntryType
 
     [JsonPropertyName("packageupload_link")]
     public required Uri PackageUploadLink { get; set; }
+
+    public async Task<IEnumerable<Uri>> GetBinaryFileUrls(CancellationToken cancellationToken = default)
+    {
+        var response = await LaunchpadClient.GetAsync(
+            LaunchpadClient.GetResourcePath(SelfLink),
+            new GetBinaryFileUrlsOptions(),
+            cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApplicationException($"Failed to get binary file URLs for source package {SourcePackageName}");
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<Uri>>(cancellationToken: cancellationToken);
+
+        return result ??
+               throw new ApplicationException(
+                   $"Invalid changelog URL for source package {SourcePackageName}: {result}");
+    }
+
+    public async Task<Uri> GetChangelogUrl(CancellationToken cancellationToken = default)
+    {
+        var response = await LaunchpadClient.GetAsync(
+            LaunchpadClient.GetResourcePath(SelfLink),
+            new GetChangelogUrlOptions(),
+            cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApplicationException($"Failed to get changelog URL for source package {SourcePackageName}");
+        }
+
+        var result = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
+
+        return Uri.TryCreate(result.Replace("\"", string.Empty), UriKind.Absolute, out var changelogUrl)
+            ? changelogUrl
+            : throw new ApplicationException($"Invalid changelog URL for source package {SourcePackageName}: {result}");
+    }
 }
