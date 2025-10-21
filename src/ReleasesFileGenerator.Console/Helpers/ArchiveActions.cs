@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using ReleasesFileGenerator.Console.Models;
 using ReleasesFileGenerator.Launchpad.Types;
 using ReleasesFileGenerator.Launchpad.Types.Models;
@@ -155,22 +156,35 @@ public static class ArchiveActions
         Dpkg.ExtractDebFile(aspNetCoreRuntimePackagePath, workingDirectory.FullName);
         Dpkg.ExtractDebFile(sdkPackagePath, workingDirectory.FullName);
 
+        var dotnetRoot = Path.Join(workingDirectory.FullName, "usr", "lib", "dotnet");
+
+        // .NET 6.0.110 and earlier use "usr/lib/dotnet/dotnet6-6.0.XXX" as the root folder.
+        var match = Regex.Match(Path.GetFileName(runtimePackagePath), @"_(\d+\.\d+\.\d+)-");
+        if (match.Success)
+        {
+            var dotnetVersion = DotnetVersion.Parse(match.Groups[1].Value);
+            if (dotnetVersion <= new DotnetVersion(6, 0, 110))
+            {
+                dotnetRoot = Path.Join(dotnetRoot, $"dotnet6-{dotnetVersion}");
+            }
+        }
+
         var runtimeVersion =
             DotnetVersion.Parse(
                 DotVersionFile.Parse(
                         DotVersionFile.FindDotVersionFile(
-                            $"{workingDirectory.FullName}/usr/lib/dotnet/shared/Microsoft.NETCore.App"))
+                            Path.Combine(dotnetRoot, "shared", "Microsoft.NETCore.App")))
                     .Version);
         var aspNetRuntimeVersion =
             DotnetVersion.Parse(
                 DotVersionFile.Parse(
                         DotVersionFile.FindDotVersionFile(
-                            $"{workingDirectory.FullName}/usr/lib/dotnet/shared/Microsoft.AspNetCore.App"))
+                            Path.Combine(dotnetRoot, "shared", "Microsoft.AspNetCore.App")))
                     .Version);
         var sdkVersion =
             DotnetVersion.Parse(
                 DotVersionFile.Parse(
-                        DotVersionFile.FindDotVersionFile($"{workingDirectory.FullName}/usr/lib/dotnet/sdk"))
+                        DotVersionFile.FindDotVersionFile(Path.Combine(dotnetRoot, "sdk")))
                     .Version);
 
 

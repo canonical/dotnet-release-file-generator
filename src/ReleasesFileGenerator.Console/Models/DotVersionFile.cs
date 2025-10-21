@@ -48,11 +48,9 @@ public class DotVersionFile
     public static string FindDotVersionFile(string directory)
     {
         var files = Directory.GetFiles(directory, ".version", SearchOption.AllDirectories);
-        if (files.Length == 0)
-        {
-            throw new FileNotFoundException("No .version file found in the specified directory.");
-        }
 
-        return files[0];
+        return files.Length == 0
+            ? throw new FileNotFoundException("No .version file found in the specified directory.")
+            : files[0];
     }
 }
