@@ -13,6 +13,9 @@ public class Channel
     [JsonConverter(typeof(DotnetVersionJsonConverter))]
     public required DotnetVersion LatestRelease { get; set; }
 
+    [JsonPropertyName("latest-release-date")]
+    public DateOnly LatestReleaseDate { get; set; }
+
     [JsonPropertyName("security")]
     public bool Security { get; set; }
 

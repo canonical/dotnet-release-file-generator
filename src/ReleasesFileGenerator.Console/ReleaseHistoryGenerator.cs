@@ -15,7 +15,7 @@ public static class ReleaseHistoryGenerator
 {
     private static readonly HttpClient HttpClient = new();
 
-    public static async Task Generate(
+    public static async Task<ChannelDetails> Generate(
         DirectoryInfo workingDirectory,
         AvailableVersionEntry versionEntry,
         Channel channel,
@@ -35,13 +35,14 @@ public static class ReleaseHistoryGenerator
         var channelDetails = new ChannelDetails
         {
             ChannelVersion = channel.ChannelVersion,
-            LatestRelease = channel.LatestRelease,
-            LatestRuntime = channel.LatestRuntime,
-            LatestSdk = channel.LatestSdk,
             SupportPhase = channel.SupportPhase,
             ReleaseType = channel.ReleaseType,
             EolDate = channel.EolDate,
-            Releases = channelDetailsReleases
+            Releases = channelDetailsReleases,
+
+            LatestRelease = DotnetVersion.Parse("1.0.0"),
+            LatestSdk = DotnetVersion.Parse("1.0.0"),
+            LatestRuntime = DotnetVersion.Parse("1.0.0"),
         };
 
         var sources =
@@ -211,14 +212,18 @@ public static class ReleaseHistoryGenerator
             channelDetailsReleases.Add(release);
         }
 
-        var latestReleaseDate = channelDetailsReleases
-            .MaxBy(r => r.ReleaseDate)?
-            .ReleaseDate;
+        var latestRelease = channelDetailsReleases.MaxBy(r => r.ReleaseDate);
 
-        if (latestReleaseDate is not null)
+        if (latestRelease is null)
         {
-            channelDetails.LatestReleaseDate = latestReleaseDate.Value;
+            throw new ApplicationException(
+                $"No latest release was found for the channel {channelDetails.ChannelVersion}");
         }
+
+        channelDetails.LatestReleaseDate = latestRelease.ReleaseDate;
+        channelDetails.LatestRelease = latestRelease.Runtime.Version;
+        channelDetails.LatestRuntime = latestRelease.Runtime.Version;
+        channelDetails.LatestSdk = latestRelease.Sdk.Version;
 
         var releaseDirectory = Directory.CreateDirectory(Path.Join(workingDirectory.FullName, channel.ChannelVersion));
         var filePath = Path.Join(releaseDirectory.FullName, "releases.json");
@@ -231,5 +236,7 @@ public static class ReleaseHistoryGenerator
 
         logger?.LogInformation("Release history for channel {ChannelVersion} written to {FilePath}",
             channel.ChannelVersion, filePath);
+
+        return channelDetails;
     }
 }

@@ -1,10 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using ReleasesFileGenerator.Console.Helpers;
 using ReleasesFileGenerator.Console.Models;
 using ReleasesFileGenerator.Launchpad.Types;
-using ReleasesFileGenerator.Launchpad.Types.Enums;
 using ReleasesFileGenerator.Types;
 using ReleasesFileGenerator.Types.ReleasesFile;
 
@@ -65,101 +63,24 @@ public static class ReleaseIndexGenerator
                 ReleasesJsonUrl = new Uri($"{urlOrigin}/{version.ChannelVersion}/releases.json", UriKind.Absolute)
             };
 
-            var publishedSources =
-                await ArchiveActions.GetPublishedSourcesForVersion(ubuntuArchive, distroSeries, version);
-
-            // We do not consider packages still in proposed to be generally available in Ubuntu.
-            var latestRelease = publishedSources
-                .Where(s => s.Pocket is not ArchivePocket.Proposed)
-                .Where(s => s.Status is ArchivePublishingStatus.Published)
-                .MaxBy(s => s.DatePublished);
-
-            var latestSecurityRelease = publishedSources
-                .Where(s => s.Pocket is ArchivePocket.Security)
-                .Where(s => s.Status is ArchivePublishingStatus.Published)
-                .MaxBy(s => s.DatePublished);
-
-            if (latestRelease is null)
-            {
-                logger?.LogError("Could not determine latest published version.");
-            }
-
-            var latestDotNetVersion = DotnetPackageVersion.Create(
-                latestRelease!.SourcePackageName,
-                latestRelease.SourcePackageVersion);
-
-            logger?.LogInformation("Latest release for version {Version} is {Release}",
-                version.ChannelVersion, latestRelease.SourcePackageVersion);
-
-            // Verify if the latest version was a security release by checking if it was published to the
-            // security pocket.
-            channel.Security = latestSecurityRelease is not null &&
-                               latestRelease.SourcePackageVersion == latestSecurityRelease.SourcePackageVersion;
-
-            logger?.LogInformation("Version {Version} security release status: {IsSecurityRelease}",
-                latestRelease.SourcePackageVersion, channel.Security);
-
-            // .NET versions equal to or higher than 8.0 contain both the Runtime and SDK versions in the source
-            // package version. Also, if the .NET version is not a pre-release version, we can also use the versions
-            // contained in the source package version.
-            // Otherwise, it is necessary to download the runtime and SDK packages from the Ubuntu archive in order
-            // to determine the versions from the .version files.
-            if (latestDotNetVersion.UpstreamRuntimeVersion is not null &&
-                latestDotNetVersion.UpstreamRuntimeVersion.IsStable)
-            {
-                channel.LatestRelease = latestDotNetVersion.UpstreamRuntimeVersion;
-                channel.LatestSdk = latestDotNetVersion.UpstreamSdkVersion;
-                channel.LatestRuntime = latestDotNetVersion.UpstreamRuntimeVersion;
-            }
-            else
-            {
-                logger?.LogInformation(
-                    "{Name} {Version} is a pre-release version or does not contain the runtime version in the source " +
-                    "package version. Downloading packages to determine the versions.",
-                    latestRelease.SourcePackageName, latestRelease.SourcePackageVersion);
-
-                var runtimePackageFile = await ArchiveActions.GetPackageFile(
-                    ubuntuArchive,
-                    version.RuntimeBinaryPackageName,
-                    latestDotNetVersion.GetUbuntuRuntimePackageVersion() ??
-                        latestDotNetVersion.GetUbuntuSdkPackageVersion());
-
-                var aspnetCoreRuntimePackageFile = await ArchiveActions.GetPackageFile(
-                    ubuntuArchive,
-                    version.AspNetCoreRuntimeBinaryPackageName,
-                    latestDotNetVersion.GetUbuntuRuntimePackageVersion() ??
-                        latestDotNetVersion.GetUbuntuSdkPackageVersion());
-
-                var sdkPackageFile = await ArchiveActions.GetPackageFile(
-                    ubuntuArchive,
-                    version.SdkBinaryPackageName,
-                    latestDotNetVersion.GetUbuntuSdkPackageVersion());
-
-                var latestVersions =
-                    await ArchiveActions.ReadVersionFromDotVersionFiles(
-                        runtimePackageFile,
-                        aspnetCoreRuntimePackageFile,
-                        sdkPackageFile,
-                        workingDirectory,
-                        shouldDeleteFiles: false);
-
-                channel.LatestRelease = latestVersions.RuntimeVersion;
-                channel.LatestRuntime = latestVersions.RuntimeVersion;
-                channel.LatestSdk = latestVersions.SdkVersion;
-            }
-
-            logger?.LogInformation("Version {Version} latest versions: Runtime: {Runtime}, SDK: {Sdk}",
-                version.ChannelVersion, channel.LatestRuntime, channel.LatestSdk);
-
-            index.Add(channel);
-
-            await ReleaseHistoryGenerator.Generate(
+            var channelDetails = await ReleaseHistoryGenerator.Generate(
                 workingDirectory,
                 version,
                 channel,
                 ubuntuArchive,
                 distroSeries,
                 loggerFactory);
+
+            channel.LatestRelease = channelDetails.LatestRelease;
+            channel.LatestSdk = channelDetails.LatestSdk;
+            channel.LatestRuntime = channelDetails.LatestRuntime;
+            channel.LatestReleaseDate = channelDetails.LatestReleaseDate;
+            channel.Security = channelDetails.Releases.MaxBy(r => r.ReleaseDate)!.Security;
+
+            logger?.LogInformation("Version {Version} latest versions: Runtime: {Runtime}, SDK: {Sdk}",
+                version.ChannelVersion, channel.LatestRuntime, channel.LatestSdk);
+
+            index.Add(channel);
         }
 
         var releasesFile = new Types.ReleasesFile.Index
@@ -169,7 +90,10 @@ public static class ReleaseIndexGenerator
 
         await File.WriteAllTextAsync(
             $"{workingDirectory.FullName}/releases-index.json",
-            JsonSerializer.Serialize(releasesFile));
+            JsonSerializer.Serialize(releasesFile, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            }));
 
         logger?.LogInformation("Releases file generated at {Path}",
             $"{workingDirectory.FullName}/releases-index.json");
