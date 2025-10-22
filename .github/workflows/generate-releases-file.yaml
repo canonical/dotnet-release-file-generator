@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '.github/workflows/generate-releases-file.yaml'
+      - 'src/**'
+      - 'test/**'
   schedule:
     - cron: '0 0 * * 1-5'
   workflow_dispatch:
