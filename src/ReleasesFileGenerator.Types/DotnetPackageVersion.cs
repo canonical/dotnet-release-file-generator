@@ -8,7 +8,7 @@ namespace ReleasesFileGenerator.Types;
 public partial class DotnetPackageVersion : IComparable<DotnetPackageVersion>
 {
     private static readonly Regex DotnetSourcePackageVersionPattern = new(
-        @"^(?<SDKVersion>\d+\.\d+\.\d+)(?:-(?<RuntimeVersion>\d+\.\d+\.\d+))?(?:~(?<PreviewStatus>rc\d+|preview\d+))?-(?<UbuntuSuffix>\d+ubuntu\d+)(?:~(?<UbuntuPreRelease>[\w\d\.]+))?(?:~(?<PpaVersion>[\w\d\.]+))$");
+        @"^(?<SDKVersion>\d+\.\d+\.\d+)(?:-(?<RuntimeVersion>\d+\.\d+\.\d+))?(?:~(?<PreviewStatus>rc\d+|preview\d+))?-(?<UbuntuSuffix>\d+ubuntu\d+)(?:~(?<UbuntuPreRelease>[\w\d\.]+))?(?:~(?<PpaVersion>[\w\d\.]+))?$");
 
     public required string SourcePackageName { get; set; }
     public required string SourcePackageVersion { get; set; }
