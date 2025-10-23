@@ -23,10 +23,10 @@ A tool to generate release metadata files (`release.json`) for .NET packages acr
 ## Usage
 
 ### Prerequisites
-- .NET 9 SDK
+- .NET 8 SDK
 
 ```bash
-sudo apt install dotnet9
+sudo apt install dotnet8
 ```
 
 ### Build
