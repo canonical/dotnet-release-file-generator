@@ -74,7 +74,7 @@ public static class ReleaseHistoryGenerator
 
         foreach (var sourcePackageGroup in sourceGroup)
         {
-            var securityRelease = false;
+            var sourceInSecurityPocket = false;
             // Take the first and only source package out of the grouping. If more than one package exists for the same
             // .NET release, e.g. 8.0.100-8.0.1-0ubuntu1~22.04.1 and 8.0.100-8.0.1-0ubuntu1~22.04.2, then
             // consider the earliest one published, i.e., the one with the lowest Ubuntu patch version.
@@ -89,7 +89,7 @@ public static class ReleaseHistoryGenerator
                 sourcePackage = orderedGroup.LastOrDefault(s => s.Pocket == ArchivePocket.Security)
                                 ?? orderedGroup.Last();
 
-                securityRelease = sourcePackage.Pocket == ArchivePocket.Security;
+                sourceInSecurityPocket = sourcePackage.Pocket == ArchivePocket.Security;
             }
 
             var sourcePackageVersion =
@@ -107,7 +107,7 @@ public static class ReleaseHistoryGenerator
                 {
                     ReleaseVersion = sourcePackageVersion.UpstreamRuntimeVersion,
                     ReleaseDate = DateOnly.FromDateTime(sourcePackage.DatePublished!.Value.UtcDateTime),
-                    Security = securityRelease,
+                    Security = sourceInSecurityPocket,
                     Runtime = new Runtime
                     {
                         Version = sourcePackageVersion.UpstreamRuntimeVersion,
@@ -180,7 +180,7 @@ public static class ReleaseHistoryGenerator
                 {
                     ReleaseVersion = versions.RuntimeVersion,
                     ReleaseDate = DateOnly.FromDateTime(sourcePackage.DatePublished!.Value.UtcDateTime),
-                    Security = securityRelease,
+                    Security = sourceInSecurityPocket,
                     Runtime = new Runtime
                     {
                         Version = versions.RuntimeVersion,
@@ -208,25 +208,25 @@ public static class ReleaseHistoryGenerator
                 };
             }
 
-            // If security release, analyze changelog for CVE numbers
-            if (release.Security)
+            // If the source package was published to a PPA, even though it was a security release, it will still be
+            // published to the Release pocket, because of how PPAs work. Therefore, we check the changelog for CVE
+            // numbers to make a final determination if this was a security release.
+            var changelogUrl = await sourcePackage.GetChangelogUrl();
+            var changelogRequest = await HttpClient.GetStringAsync(changelogUrl);
+
+            using var changelogReader = new DpkgChangelogReader(new StringReader(changelogRequest));
+
+            var entry = await changelogReader.ReadChangelogEntryAsync();
+            if (entry is { HasValue: true, Value: not null })
             {
-                var changelogUrl = await sourcePackage.GetChangelogUrl();
-                var changelogRequest = await HttpClient.GetStringAsync(changelogUrl);
+                var cvePattern = @"CVE-\d{4}-\d{4,7}";
+                var cveMatches = Regex.Matches(entry.Value.Value.Description, cvePattern, RegexOptions.IgnoreCase);
+                var cveNumbers = cveMatches.Select(m => Cve.Parse(m.Value, null)).Distinct().ToArray();
 
-                using var changelogReader = new DpkgChangelogReader(new StringReader(changelogRequest));
-
-                var entry = await changelogReader.ReadChangelogEntryAsync();
-                if (entry is { HasValue: true, Value: not null })
+                if (cveNumbers.Any())
                 {
-                    var cvePattern = @"CVE-\d{4}-\d{4,7}";
-                    var cveMatches = Regex.Matches(entry.Value.Value.Description, cvePattern, RegexOptions.IgnoreCase);
-                    var cveNumbers = cveMatches.Select(m => Cve.Parse(m.Value, null)).Distinct().ToArray();
-
-                    if (cveNumbers.Any())
-                    {
-                        release.CveList = cveNumbers;
-                    }
+                    release.CveList = cveNumbers;
+                    release.Security = true;
                 }
             }
 
