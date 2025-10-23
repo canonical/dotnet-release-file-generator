@@ -8,6 +8,7 @@ using ReleasesFileGenerator.Launchpad.Types;
 using ReleasesFileGenerator.Launchpad.Types.Enums;
 using ReleasesFileGenerator.Types;
 using ReleasesFileGenerator.Types.ReleasesFile;
+using Archive = ReleasesFileGenerator.Launchpad.Types.Archive;
 
 namespace ReleasesFileGenerator.Console;
 
@@ -20,6 +21,7 @@ public static class ReleaseHistoryGenerator
         AvailableVersionEntry versionEntry,
         Channel channel,
         Archive ubuntuArchive,
+        Archive backportsArchive,
         DistroSeries distroSeries,
         ILoggerFactory? loggerFactory = null)
     {
@@ -45,8 +47,15 @@ public static class ReleaseHistoryGenerator
             LatestRuntime = DotnetVersion.Parse("1.0.0"),
         };
 
-        var sources =
-            await ArchiveActions.GetPublishedSourcesForVersion(ubuntuArchive, distroSeries, versionEntry);
+        IReadOnlyCollection<SourcePackagePublishingHistory> sources;
+        if (versionEntry.Archive == Models.Archive.Ubuntu)
+        {
+            sources = await ArchiveActions.GetPublishedSourcesForVersion(ubuntuArchive, distroSeries, versionEntry);
+        }
+        else
+        {
+            sources = await ArchiveActions.GetPublishedSourcesForVersion(backportsArchive, distroSeries, versionEntry);
+        }
 
         sources = sources
             .Where(s => s.DatePublished is not null && s.Pocket != ArchivePocket.Proposed)
@@ -138,15 +147,27 @@ public static class ReleaseHistoryGenerator
                 binaryFiles = binaryFiles.Where(u => u.ToString().Contains("amd64")).ToList();
 
                 var runtimePackageFileUrl =
-                    binaryFiles.Single(u => u.ToString().Contains(versionEntry.RuntimeBinaryPackageName)
+                    binaryFiles.SingleOrDefault(u => u.ToString().Contains(versionEntry.RuntimeBinaryPackageName)
                         && u.ToString().EndsWith(".deb"));
                 var aspNetCoreRuntimePackageFileUrl =
-                    binaryFiles.Single(u => u.ToString().Contains(versionEntry.AspNetCoreRuntimeBinaryPackageName)
+                    binaryFiles.SingleOrDefault(u => u.ToString().Contains(versionEntry.AspNetCoreRuntimeBinaryPackageName)
                                             && u.ToString().EndsWith(".deb"));
                 var sdkPackageFileUrl =
-                    binaryFiles.Single(u => u.ToString().Contains(versionEntry.SdkBinaryPackageName)
+                    binaryFiles.SingleOrDefault(u => u.ToString().Contains(versionEntry.SdkBinaryPackageName)
                                             && !u.ToString().Contains("source-built-artifacts")
                                             && u.ToString().EndsWith(".deb"));
+
+                if (runtimePackageFileUrl is null ||
+                    aspNetCoreRuntimePackageFileUrl is null ||
+                    sdkPackageFileUrl is null)
+                {
+                    logger?.LogWarning("Could not find all required binary packages for source package " +
+                                      "{SourcePackageName} {SourcePackageVersion}. " +
+                                      "Skipping this release.",
+                        sourcePackage.SourcePackageName, sourcePackage.SourcePackageVersion);
+
+                    continue;
+                }
 
                 var versions = await ArchiveActions.ReadVersionFromDotVersionFiles(
                     runtimePackageFileUrl,

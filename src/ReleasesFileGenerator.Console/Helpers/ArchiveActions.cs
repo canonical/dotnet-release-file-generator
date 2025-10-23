@@ -6,6 +6,7 @@ using ReleasesFileGenerator.Launchpad.Types.Models;
 using ReleasesFileGenerator.Launchpad.Types.Options.Archive;
 using ReleasesFileGenerator.Launchpad.Types.Options.BinaryPackagePublishingHistory;
 using ReleasesFileGenerator.Types;
+using Archive = ReleasesFileGenerator.Launchpad.Types.Archive;
 
 namespace ReleasesFileGenerator.Console.Helpers;
 

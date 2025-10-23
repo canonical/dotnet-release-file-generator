@@ -33,4 +33,8 @@ public class AvailableVersionEntry
 
     [JsonPropertyName("sdk-binary-package-name")]
     public required string SdkBinaryPackageName { get; set; }
+
+    [JsonPropertyName("archive")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public required Archive Archive { get; set; }
 }

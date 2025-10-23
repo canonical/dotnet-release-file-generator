@@ -5,6 +5,7 @@ using ReleasesFileGenerator.Console.Models;
 using ReleasesFileGenerator.Launchpad.Types;
 using ReleasesFileGenerator.Types;
 using ReleasesFileGenerator.Types.ReleasesFile;
+using Archive = ReleasesFileGenerator.Launchpad.Types.Archive;
 
 namespace ReleasesFileGenerator.Console;
 
@@ -19,12 +20,14 @@ public static class ReleaseIndexGenerator
     /// <param name="workingDirectory">Working directory of the script.</param>
     /// <param name="availableVersions">List of available .NET versions for the specified Ubuntu series.</param>
     /// <param name="ubuntuArchive">Launchpad archive object to query.</param>
+    /// <param name="backportsArchive">.NET backports PPA archive object to query.</param>
     /// <param name="distroSeries">Distro series object to query.</param>
     /// <param name="loggerFactory">Logger factory.</param>
     public static async Task Generate(
         DirectoryInfo workingDirectory,
         ReadOnlyCollection<AvailableVersionEntry> availableVersions,
         Archive ubuntuArchive,
+        Archive backportsArchive,
         DistroSeries distroSeries,
         ILoggerFactory? loggerFactory = null)
     {
@@ -68,6 +71,7 @@ public static class ReleaseIndexGenerator
                 version,
                 channel,
                 ubuntuArchive,
+                backportsArchive,
                 distroSeries,
                 loggerFactory);
 

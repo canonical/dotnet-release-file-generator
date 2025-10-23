@@ -67,6 +67,8 @@ public static class Program
             currentlyAvailableVersions.Count, series);
 
         var ubuntuArchive = await Archives.GetByReference(GetByReferenceOptions.Ubuntu);
+        var backportsArchive = await Archives.GetByReference(GetByReferenceOptions.BackportsPpa);
+
         var distribution = await ubuntuArchive.GetDistributionAsync();
         // Get the distribution series based on the provided series name.
         var distroSeries = await distribution.GetSeriesAsync(new GetSeriesOptions(series));
@@ -75,6 +77,7 @@ public static class Program
             _workingDirectory,
             currentlyAvailableVersions.AsReadOnly(),
             ubuntuArchive,
+            backportsArchive,
             distroSeries,
             loggerFactory);
 

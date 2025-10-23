@@ -1,5 +1,17 @@
 [
   {
+    "channel-version": "9.0",
+    "product": ".NET",
+    "support-phase": "active",
+    "release-type": "sts",
+    "eol-date": "2026-11-10",
+    "source-package-name": "dotnet9",
+    "runtime-binary-package-name": "dotnet-runtime-9.0",
+    "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-9.0",
+    "sdk-binary-package-name": "dotnet-sdk-9.0",
+    "archive": "backports"
+  },
+  {
     "channel-version": "8.0",
     "product": ".NET",
     "support-phase": "active",
@@ -8,7 +20,8 @@
     "source-package-name": "dotnet8",
     "runtime-binary-package-name": "dotnet-runtime-8.0",
     "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-8.0",
-    "sdk-binary-package-name": "dotnet-sdk-8.0"
+    "sdk-binary-package-name": "dotnet-sdk-8.0",
+    "archive": "ubuntu"
   },
   {
     "channel-version": "7.0",
@@ -19,7 +32,8 @@
     "source-package-name": "dotnet7",
     "runtime-binary-package-name": "dotnet-runtime-7.0",
     "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-7.0",
-    "sdk-binary-package-name": "dotnet-sdk-7.0"
+    "sdk-binary-package-name": "dotnet-sdk-7.0",
+    "archive": "ubuntu"
   },
   {
     "channel-version": "6.0",
@@ -30,6 +44,7 @@
     "source-package-name": "dotnet6",
     "runtime-binary-package-name": "dotnet-runtime-6.0",
     "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-6.0",
-    "sdk-binary-package-name": "dotnet-sdk-6.0"
+    "sdk-binary-package-name": "dotnet-sdk-6.0",
+    "archive": "ubuntu"
   }
 ]
