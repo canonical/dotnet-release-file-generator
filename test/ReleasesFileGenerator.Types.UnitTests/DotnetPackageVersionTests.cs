@@ -17,9 +17,9 @@ public class DotnetPackageVersionTests
         Assert.Equal(packageVersion.UpstreamSdkVersion.Minor, sdkMinor);
         Assert.Equal(packageVersion.UpstreamSdkVersion.Patch, sdkPatch);
 
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Major, runtimeMajor);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Minor, runtimeMinor);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Patch, runtimePatch);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Major, runtimeMajor);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Minor, runtimeMinor);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Patch, runtimePatch);
     }
 
     [Theory]
@@ -40,12 +40,12 @@ public class DotnetPackageVersionTests
         Assert.Equal(packageVersion.UpstreamSdkVersion.IsRc, isRc);
         Assert.Equal(packageVersion.UpstreamSdkVersion.PreviewIdentifier, previewIdentifier);
 
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Major, runtimeMajor);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Minor, runtimeMinor);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Patch, runtimePatch);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.IsPreview, isPreview);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.IsRc, isRc);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.PreviewIdentifier, previewIdentifier);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Major, runtimeMajor);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Minor, runtimeMinor);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Patch, runtimePatch);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.IsPreview, isPreview);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.IsRc, isRc);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.PreviewIdentifier, previewIdentifier);
     }
 
     [Theory]
@@ -77,9 +77,9 @@ public class DotnetPackageVersionTests
         Assert.Equal(packageVersion.UpstreamSdkVersion.Minor, sdkMinor);
         Assert.Equal(packageVersion.UpstreamSdkVersion.Patch, sdkPatch);
 
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Major, runtimeMajor);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Minor, runtimeMinor);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Patch, runtimePatch);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Major, runtimeMajor);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Minor, runtimeMinor);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Patch, runtimePatch);
     }
 
     [Theory]
@@ -103,12 +103,12 @@ public class DotnetPackageVersionTests
         Assert.Equal(packageVersion.UpstreamSdkVersion.IsRc, isRc);
         Assert.Equal(packageVersion.UpstreamSdkVersion.PreviewIdentifier, previewIdentifier);
 
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Major, runtimeMajor);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Minor, runtimeMinor);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.Patch, runtimePatch);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.IsPreview, isPreview);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.IsRc, isRc);
-        Assert.Equal(packageVersion.UpstreamRuntimeVersion.PreviewIdentifier, previewIdentifier);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Major, runtimeMajor);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Minor, runtimeMinor);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.Patch, runtimePatch);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.IsPreview, isPreview);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.IsRc, isRc);
+        Assert.Equal(packageVersion.UpstreamRuntimeVersion?.PreviewIdentifier, previewIdentifier);
     }
 
     [Theory]
