@@ -26,8 +26,7 @@ jobs:
 
       - name: Install .NET
         run: |
-          sudo add-apt-repository --yes ppa:dotnet/backports
-          sudo apt install --yes dotnet9
+          sudo apt install --update --yes dotnet8
 
       - name: Build Releases File Generator
         run: |
@@ -36,9 +35,8 @@ jobs:
             --runtime linux-x64 \
             --self-contained \
             --output ./dist \
-            --property:PublishSingleFile=true
-          # Remove unnecessary debug files
-          rm ./dist/*.pdb
+            --property:PublishSingleFile=true \
+            --property:DebugSymbols=false
 
       - name: Upload Releases File Generator artifact
         uses: actions/upload-artifact@v4

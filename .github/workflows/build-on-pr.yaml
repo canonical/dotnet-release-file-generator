@@ -14,8 +14,7 @@ jobs:
 
       - name: Install .NET
         run: |
-          sudo add-apt-repository --yes ppa:dotnet/backports
-          sudo apt install --yes dotnet9
+          sudo apt install --update --yes dotnet8
 
       - name: Restore dependencies
         run: dotnet restore
