@@ -5,7 +5,10 @@ namespace ReleasesFileGenerator.Console.Helpers;
 
 public static class FileDownloader
 {
-    public static Task DownloadFileAsync(string destinationDirectory, CancellationToken cancellationToken,
+    public static Task DownloadFileAsync(
+        string destinationDirectory,
+        bool overwrite = false,
+        CancellationToken cancellationToken = default,
         params Uri[] fileUrls)
     {
         return AnsiConsole
@@ -29,7 +32,14 @@ public static class FileDownloader
 
                     if (File.Exists(destination))
                     {
-                        continue;
+                        if (overwrite)
+                        {
+                            File.Delete(destination);
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
 
                     var download = DownloadBuilder.New()

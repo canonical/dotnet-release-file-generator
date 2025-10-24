@@ -28,7 +28,7 @@ public static class ReleaseHistoryGenerator
         var logger = default(ILogger);
         if (loggerFactory is not null)
         {
-            logger = loggerFactory.CreateLogger(nameof(ReleaseIndexGenerator));
+            logger = loggerFactory.CreateLogger(nameof(ReleaseHistoryGenerator));
         }
 
         logger?.LogInformation("Creating release history for channel {ChannelVersion}", channel.ChannelVersion);

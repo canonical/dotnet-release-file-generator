@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using ReleasesFileGenerator.Console.Models;
 using ReleasesFileGenerator.Launchpad.Types;
 using ReleasesFileGenerator.Launchpad.Types.Models;
@@ -12,6 +13,16 @@ namespace ReleasesFileGenerator.Console.Helpers;
 
 public static class ArchiveActions
 {
+    #region Logging
+    private static readonly ILogger Logger = LoggerFactory.Create(builder =>
+    {
+        builder.AddConsole(options =>
+        {
+            options.LogToStandardErrorThreshold = LogLevel.Error;
+        });
+    }).CreateLogger(nameof(ArchiveActions));
+    #endregion
+
     /// <summary>
     /// Gets the published source package history for a specific version in a given Ubuntu distribution series.
     /// </summary>
@@ -136,15 +147,37 @@ public static class ArchiveActions
         var sdkPackagePath =
             $"{workingDirectory.FullName}/{sdkPackageFileUrl.Segments.Last()}";
 
-        await FileDownloader.DownloadFileAsync(workingDirectory.FullName, CancellationToken.None,
-            runtimePackageFileUrl, aspnetCoreRuntimePackageFileUrl, sdkPackageFileUrl);
+        // Sometimes the extract operation fails with FileNotFoundException, so we retry 3 times.
+        var trial = 1;
+        while (true)
+        {
+            await FileDownloader.DownloadFileAsync(
+                workingDirectory.FullName,
+                overwrite: true,
+                cancellationToken: CancellationToken.None,
+                runtimePackageFileUrl, aspnetCoreRuntimePackageFileUrl, sdkPackageFileUrl);
 
-        return ReadVersionsFromDotVersionFiles(
-            runtimePackagePath,
-            aspNetCoreRuntimePackagePath,
-            sdkPackagePath,
-            workingDirectory,
-            shouldDeleteFiles);
+            try
+            {
+                return ReadVersionsFromDotVersionFiles(
+                    runtimePackagePath,
+                    aspNetCoreRuntimePackagePath,
+                    sdkPackagePath,
+                    workingDirectory,
+                    shouldDeleteFiles);
+            }
+            catch (FileNotFoundException e)
+            {
+                if (trial++ >= 3)
+                {
+                    throw;
+                }
+
+                Logger.LogWarning(
+                    "Attempt {Trial} to read .NET versions failed with error: {EMessage}. Retrying...",
+                    trial - 1, e.Message);
+            }
+        }
     }
 
     private static (DotnetVersion RuntimeVersion, DotnetVersion AspNetRuntimeVersion, DotnetVersion SdkVersion)
