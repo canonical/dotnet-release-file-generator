@@ -1,0 +1,32 @@
+{
+  "releases-index": [
+    {
+      "channel-version": "9.0",
+      "latest-release": "9.0.10",
+      "latest-release-date": "2025-10-14",
+      "security": true,
+      "latest-runtime": "9.0.10",
+      "latest-sdk": "9.0.111",
+      "product": ".NET",
+      "support-phase": "Active",
+      "eol-date": "2026-11-10",
+      "release-type": "Sts",
+      "releases.json": "https://raw.githubusercontent.com/canonical/dotnet-release-file-generator/refs/heads/release/plucky/9.0/releases.json",
+      "supported-os.json": null
+    },
+    {
+      "channel-version": "8.0",
+      "latest-release": "8.0.21",
+      "latest-release-date": "2025-10-14",
+      "security": true,
+      "latest-runtime": "8.0.21",
+      "latest-sdk": "8.0.121",
+      "product": ".NET",
+      "support-phase": "Active",
+      "eol-date": "2026-11-10",
+      "release-type": "Lts",
+      "releases.json": "https://raw.githubusercontent.com/canonical/dotnet-release-file-generator/refs/heads/release/plucky/8.0/releases.json",
+      "supported-os.json": null
+    }
+  ]
+}
