@@ -1,5 +1,17 @@
 [
   {
+    "channel-version": "10.0",
+    "product": ".NET",
+    "support-phase": "active",
+    "release-type": "lts",
+    "eol-date": "2028-11-14",
+    "source-package-name": "dotnet10",
+    "runtime-binary-package-name": "dotnet-runtime-10.0",
+    "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-10.0",
+    "sdk-binary-package-name": "dotnet-sdk-10.0",
+    "archive": "backports"
+  },
+  {
     "channel-version": "9.0",
     "product": ".NET",
     "support-phase": "active",
