@@ -144,18 +144,15 @@ public static class ReleaseHistoryGenerator
                 var binaryFiles = await sourcePackage.GetBinaryFileUrls();
 
                 // Default to amd64 binaries
-                binaryFiles = binaryFiles.Where(u => u.ToString().Contains("amd64")).ToList();
+                binaryFiles = binaryFiles.Where(u => u.ToString().EndsWith("amd64.deb")).ToList();
 
                 var runtimePackageFileUrl =
-                    binaryFiles.SingleOrDefault(u => u.ToString().Contains(versionEntry.RuntimeBinaryPackageName)
-                        && u.ToString().EndsWith(".deb"));
+                    binaryFiles.SingleOrDefault(u => u.ToString().Contains(versionEntry.RuntimeBinaryPackageName));
                 var aspNetCoreRuntimePackageFileUrl =
-                    binaryFiles.SingleOrDefault(u => u.ToString().Contains(versionEntry.AspNetCoreRuntimeBinaryPackageName)
-                                            && u.ToString().EndsWith(".deb"));
+                    binaryFiles.SingleOrDefault(u => u.ToString().Contains(versionEntry.AspNetCoreRuntimeBinaryPackageName));
                 var sdkPackageFileUrl =
                     binaryFiles.SingleOrDefault(u => u.ToString().Contains(versionEntry.SdkBinaryPackageName)
-                                            && !u.ToString().Contains("source-built-artifacts")
-                                            && u.ToString().EndsWith(".deb"));
+                                            && !u.ToString().Contains("source-built-artifacts"));
 
                 if (runtimePackageFileUrl is null ||
                     aspNetCoreRuntimePackageFileUrl is null ||
