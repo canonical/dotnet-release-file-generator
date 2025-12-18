@@ -14,7 +14,7 @@ jobs:
 
       - name: Install .NET
         run: |
-          sudo apt install --update --yes dotnet8
+          sudo apt install --update --yes dotnet10
 
       - name: Restore dependencies
         run: dotnet restore
