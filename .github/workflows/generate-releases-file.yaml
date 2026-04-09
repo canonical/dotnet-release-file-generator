@@ -22,7 +22,7 @@ jobs:
       releases: ${{ steps.generate-matrix.outputs.releases }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install .NET
         run: |
@@ -39,7 +39,7 @@ jobs:
             --property:DebugSymbols=false
 
       - name: Upload Releases File Generator artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: releases-file-generator
           path: ./dist
@@ -60,7 +60,7 @@ jobs:
     steps:
       - name: Download Releases File Generator artifact
         id: download-artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: releases-file-generator
 
