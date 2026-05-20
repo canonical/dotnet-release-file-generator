@@ -1,0 +1,40 @@
+{
+  "channel-version": "10.0",
+  "latest-release": "10.0.0",
+  "latest-release-date": "2025-12-16",
+  "latest-runtime": "10.0.0",
+  "latest-sdk": "10.0.100",
+  "support-phase": "Active",
+  "release-type": "Lts",
+  "eol-date": "2028-11-14",
+  "lifecycle-policy": null,
+  "releases": [
+    {
+      "release-date": "2025-12-16",
+      "release-version": "10.0.0",
+      "security": false,
+      "cve-list": [],
+      "release-notes": null,
+      "runtime": {
+        "version": "10.0.0",
+        "version-display": "10.0.0"
+      },
+      "sdk": {
+        "version": "10.0.100",
+        "version-display": "10.0.100",
+        "runtime-version": "10.0.0"
+      },
+      "sdks": [
+        {
+          "version": "10.0.100",
+          "version-display": "10.0.100",
+          "runtime-version": "10.0.0"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "10.0.0",
+        "version-display": "10.0.0"
+      }
+    }
+  ]
+}
