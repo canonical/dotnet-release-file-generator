@@ -20,7 +20,7 @@ public class AvailableVersionEntry
     public ReleaseType ReleaseType { get; set; }
 
     [JsonPropertyName("eol-date")]
-    public DateOnly EolDate { get; set; }
+    public DateOnly? EolDate { get; set; }
 
     [JsonPropertyName("source-package-name")]
     public required string SourcePackageName { get; set; }
