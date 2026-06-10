@@ -1,5 +1,17 @@
 [
   {
+    "channel-version": "11.0",
+    "product": ".NET",
+    "support-phase": "preview",
+    "release-type": "sts",
+    "eol-date": null,
+    "source-package-name": "dotnet11",
+    "runtime-binary-package-name": "dotnet-runtime-11.0",
+    "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-11.0",
+    "sdk-binary-package-name": "dotnet-sdk-11.0",
+    "archive": "previews"
+  },
+  {
     "channel-version": "10.0",
     "product": ".NET",
     "support-phase": "active",
@@ -21,7 +33,7 @@
     "runtime-binary-package-name": "dotnet-runtime-9.0",
     "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-9.0",
     "sdk-binary-package-name": "dotnet-sdk-9.0",
-    "archive": "ubuntu"
+    "archive": "backports"
   },
   {
     "channel-version": "8.0",
@@ -33,6 +45,6 @@
     "runtime-binary-package-name": "dotnet-runtime-8.0",
     "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-8.0",
     "sdk-binary-package-name": "dotnet-sdk-8.0",
-    "archive": "ubuntu"
+    "archive": "backports"
   }
 ]
