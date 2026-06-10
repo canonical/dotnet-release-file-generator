@@ -50,6 +50,7 @@ jobs:
     strategy:
       matrix:
         release: ${{ fromJson(needs.build-releases-file-generator.outputs.releases) }}
+      fail-fast: false
     steps:
       - name: Download Releases File Generator artifact
         id: download-artifact
