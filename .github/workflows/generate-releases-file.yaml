@@ -1,15 +1,6 @@
 name: Generate Releases File
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/generate-releases-file.yaml'
-      - 'src/**'
-      - 'test/**'
-  schedule:
-    - cron: '0 0 * * 1-5'
   workflow_dispatch:
 
 env:
@@ -54,6 +45,8 @@ jobs:
   generate-releases-file:
     needs: build-releases-file-generator
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
         release: ${{ fromJson(needs.build-releases-file-generator.outputs.releases) }}
@@ -91,3 +84,26 @@ jobs:
           branch: release/${{ matrix.release }}
           force: true
           directory: ${{ steps.generate-releases-file.outputs.scratch_dir }}
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build-releases-file-generator, generate-releases-file]
+    if: always() && (needs.build-releases-file-generator.result == 'failure' || needs.generate-releases-file.result == 'failure')
+    steps:
+      - name: Notify Mattermost on failure
+        uses: mattermost/action-mattermost-notify@master
+        with:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+          MATTERMOST_CHANNEL: dotnet-gha-triggers
+          TEXT: |
+            :x: **Generate Releases File Workflow Failed**
+
+            **Workflow:** ${{ github.workflow }}
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.ref_name }}
+            **Triggered by:** ${{ github.actor }}
+            **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            **Job Status:**
+            - Build Releases File Generator: ${{ needs.build-releases-file-generator.result }}
+            - Generate Releases File: ${{ needs.generate-releases-file.result }}
