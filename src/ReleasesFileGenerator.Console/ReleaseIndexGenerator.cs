@@ -28,6 +28,7 @@ public static class ReleaseIndexGenerator
         ReadOnlyCollection<AvailableVersionEntry> availableVersions,
         Archive ubuntuArchive,
         Archive backportsArchive,
+        Archive previewsArchive,
         DistroSeries distroSeries,
         ILoggerFactory? loggerFactory = null)
     {
@@ -72,6 +73,7 @@ public static class ReleaseIndexGenerator
                 channel,
                 ubuntuArchive,
                 backportsArchive,
+                previewsArchive,
                 distroSeries,
                 loggerFactory);
 

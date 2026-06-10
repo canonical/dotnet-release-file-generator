@@ -22,6 +22,7 @@ public static class ReleaseHistoryGenerator
         Channel channel,
         Archive ubuntuArchive,
         Archive backportsArchive,
+        Archive previewsArchive,
         DistroSeries distroSeries,
         ILoggerFactory? loggerFactory = null)
     {
@@ -51,6 +52,10 @@ public static class ReleaseHistoryGenerator
         if (versionEntry.Archive == Models.Archive.Ubuntu)
         {
             sources = await ArchiveActions.GetPublishedSourcesForVersion(ubuntuArchive, distroSeries, versionEntry);
+        }
+        else if (versionEntry.Archive == Models.Archive.Previews)
+        {
+            sources = await ArchiveActions.GetPublishedSourcesForVersion(previewsArchive, distroSeries, versionEntry);
         }
         else
         {

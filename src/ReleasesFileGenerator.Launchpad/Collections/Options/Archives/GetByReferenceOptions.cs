@@ -21,6 +21,11 @@ public class GetByReferenceOptions : RequestOptionsBase
         Reference = "~dotnet/ubuntu/backports"
     };
 
+    public static GetByReferenceOptions PreviewsPpa => new()
+    {
+        Reference = "~dotnet/ubuntu/previews"
+    };
+
     internal override string ToQueryString()
     {
         const string wsop = "getByReference";
