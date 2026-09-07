@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json.schemastore.org/dotnet-releases-index.json",
+  "releases-index": [
+    {
+      "channel-version": "11.0",
+      "latest-release": "11.0.0-preview.7",
+      "latest-release-date": "2026-08-19",
+      "security": false,
+      "latest-runtime": "11.0.0-preview.7",
+      "latest-sdk": "11.0.100-preview.7",
+      "product": ".NET",
+      "support-phase": "preview",
+      "eol-date": null,
+      "release-type": "sts",
+      "releases.json": "https://raw.githubusercontent.com/canonical/dotnet-release-file-generator/refs/heads/release/resolute/11.0/releases.json",
+      "supported-os.json": null
+    },
+    {
+      "channel-version": "10.0",
+      "latest-release": "10.0.11",
+      "latest-release-date": "2026-08-18",
+      "security": true,
+      "latest-runtime": "10.0.11",
+      "latest-sdk": "10.0.111",
+      "product": ".NET",
+      "support-phase": "active",
+      "eol-date": "2028-11-14",
+      "release-type": "lts",
+      "releases.json": "https://raw.githubusercontent.com/canonical/dotnet-release-file-generator/refs/heads/release/resolute/10.0/releases.json",
+      "supported-os.json": null
+    },
+    {
+      "channel-version": "9.0",
+      "latest-release": "9.0.19",
+      "latest-release-date": "2026-08-18",
+      "security": true,
+      "latest-runtime": "9.0.19",
+      "latest-sdk": "9.0.120",
+      "product": ".NET",
+      "support-phase": "active",
+      "eol-date": "2026-11-10",
+      "release-type": "sts",
+      "releases.json": "https://raw.githubusercontent.com/canonical/dotnet-release-file-generator/refs/heads/release/resolute/9.0/releases.json",
+      "supported-os.json": null
+    },
+    {
+      "channel-version": "8.0",
+      "latest-release": "8.0.30",
+      "latest-release-date": "2026-08-18",
+      "security": true,
+      "latest-runtime": "8.0.30",
+      "latest-sdk": "8.0.130",
+      "product": ".NET",
+      "support-phase": "active",
+      "eol-date": "2026-11-10",
+      "release-type": "lts",
+      "releases.json": "https://raw.githubusercontent.com/canonical/dotnet-release-file-generator/refs/heads/release/resolute/8.0/releases.json",
+      "supported-os.json": null
+    }
+  ]
+}
