@@ -1,0 +1,91 @@
+{
+  "channel-version": "11.0",
+  "latest-release": "11.0.0-preview.7",
+  "latest-release-date": "2026-08-19",
+  "latest-runtime": "11.0.0-preview.7",
+  "latest-sdk": "11.0.100-preview.7",
+  "support-phase": "preview",
+  "release-type": "sts",
+  "eol-date": null,
+  "lifecycle-policy": null,
+  "releases": [
+    {
+      "release-date": "2026-08-19",
+      "release-version": "11.0.0-preview.7",
+      "security": false,
+      "release-notes": null,
+      "runtime": {
+        "version": "11.0.0-preview.7",
+        "version-display": "11.0.0-preview.7"
+      },
+      "sdk": {
+        "version": "11.0.100-preview.7",
+        "version-display": "11.0.100-preview.7",
+        "runtime-version": "11.0.0-preview.7"
+      },
+      "sdks": [
+        {
+          "version": "11.0.100-preview.7",
+          "version-display": "11.0.100-preview.7",
+          "runtime-version": "11.0.0-preview.7"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "11.0.0-preview.7",
+        "version-display": "11.0.0-preview.7"
+      }
+    },
+    {
+      "release-date": "2026-07-22",
+      "release-version": "11.0.0-preview.6",
+      "security": false,
+      "release-notes": null,
+      "runtime": {
+        "version": "11.0.0-preview.6",
+        "version-display": "11.0.0-preview.6"
+      },
+      "sdk": {
+        "version": "11.0.100-preview.6",
+        "version-display": "11.0.100-preview.6",
+        "runtime-version": "11.0.0-preview.6"
+      },
+      "sdks": [
+        {
+          "version": "11.0.100-preview.6",
+          "version-display": "11.0.100-preview.6",
+          "runtime-version": "11.0.0-preview.6"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "11.0.0-preview.6",
+        "version-display": "11.0.0-preview.6"
+      }
+    },
+    {
+      "release-date": "2026-07-01",
+      "release-version": "11.0.0-preview.5",
+      "security": false,
+      "release-notes": null,
+      "runtime": {
+        "version": "11.0.0-preview.5",
+        "version-display": "11.0.0-preview.5"
+      },
+      "sdk": {
+        "version": "11.0.100-preview.5",
+        "version-display": "11.0.100-preview.5",
+        "runtime-version": "11.0.0-preview.5"
+      },
+      "sdks": [
+        {
+          "version": "11.0.100-preview.5",
+          "version-display": "11.0.100-preview.5",
+          "runtime-version": "11.0.0-preview.5"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "11.0.0-preview.5",
+        "version-display": "11.0.0-preview.5"
+      }
+    }
+  ]
+}
