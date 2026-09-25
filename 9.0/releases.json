@@ -1,0 +1,199 @@
+{
+  "channel-version": "9.0",
+  "latest-release": "9.0.18",
+  "latest-release-date": "2026-07-17",
+  "latest-runtime": "9.0.18",
+  "latest-sdk": "9.0.119",
+  "support-phase": "active",
+  "release-type": "sts",
+  "eol-date": "2026-11-10",
+  "lifecycle-policy": null,
+  "releases": [
+    {
+      "release-date": "2026-07-17",
+      "release-version": "9.0.18",
+      "security": true,
+      "cve-list": [
+        {
+          "cve-id": "CVE-2026-57108",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-57108"
+        },
+        {
+          "cve-id": "CVE-2026-47303",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-47303"
+        },
+        {
+          "cve-id": "CVE-2026-47300",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-47300"
+        },
+        {
+          "cve-id": "CVE-2026-50659",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-50659"
+        },
+        {
+          "cve-id": "CVE-2026-50528",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-50528"
+        },
+        {
+          "cve-id": "CVE-2026-50525",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-50525"
+        },
+        {
+          "cve-id": "CVE-2026-47304",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-47304"
+        },
+        {
+          "cve-id": "CVE-2026-50527",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-50527"
+        },
+        {
+          "cve-id": "CVE-2026-50648",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-50648"
+        },
+        {
+          "cve-id": "CVE-2026-47302",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-47302"
+        },
+        {
+          "cve-id": "CVE-2026-50524",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-50524"
+        },
+        {
+          "cve-id": "CVE-2026-50526",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-50526"
+        },
+        {
+          "cve-id": "CVE-2026-50651",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-50651"
+        }
+      ],
+      "release-notes": null,
+      "runtime": {
+        "version": "9.0.18",
+        "version-display": "9.0.18"
+      },
+      "sdk": {
+        "version": "9.0.119",
+        "version-display": "9.0.119",
+        "runtime-version": "9.0.18"
+      },
+      "sdks": [
+        {
+          "version": "9.0.119",
+          "version-display": "9.0.119",
+          "runtime-version": "9.0.18"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "9.0.18",
+        "version-display": "9.0.18"
+      }
+    },
+    {
+      "release-date": "2026-06-11",
+      "release-version": "9.0.17",
+      "security": true,
+      "cve-list": [
+        {
+          "cve-id": "CVE-2026-45491",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-45491"
+        },
+        {
+          "cve-id": "CVE-2026-45591",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-45591"
+        }
+      ],
+      "release-notes": null,
+      "runtime": {
+        "version": "9.0.17",
+        "version-display": "9.0.17"
+      },
+      "sdk": {
+        "version": "9.0.118",
+        "version-display": "9.0.118",
+        "runtime-version": "9.0.17"
+      },
+      "sdks": [
+        {
+          "version": "9.0.118",
+          "version-display": "9.0.118",
+          "runtime-version": "9.0.17"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "9.0.17",
+        "version-display": "9.0.17"
+      }
+    },
+    {
+      "release-date": "2026-05-19",
+      "release-version": "9.0.16",
+      "security": false,
+      "release-notes": null,
+      "runtime": {
+        "version": "9.0.16",
+        "version-display": "9.0.16"
+      },
+      "sdk": {
+        "version": "9.0.117",
+        "version-display": "9.0.117",
+        "runtime-version": "9.0.16"
+      },
+      "sdks": [
+        {
+          "version": "9.0.117",
+          "version-display": "9.0.117",
+          "runtime-version": "9.0.16"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "9.0.16",
+        "version-display": "9.0.16"
+      }
+    },
+    {
+      "release-date": "2026-05-14",
+      "release-version": "9.0.15",
+      "security": true,
+      "cve-list": [
+        {
+          "cve-id": "CVE-2026-33116",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-33116"
+        },
+        {
+          "cve-id": "CVE-2026-32203",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-32203"
+        },
+        {
+          "cve-id": "CVE-2026-32178",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-32178"
+        },
+        {
+          "cve-id": "CVE-2026-26171",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-26171"
+        }
+      ],
+      "release-notes": null,
+      "runtime": {
+        "version": "9.0.15",
+        "version-display": "9.0.15"
+      },
+      "sdk": {
+        "version": "9.0.116",
+        "version-display": "9.0.116",
+        "runtime-version": "9.0.15"
+      },
+      "sdks": [
+        {
+          "version": "9.0.116",
+          "version-display": "9.0.116",
+          "runtime-version": "9.0.15"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "9.0.15",
+        "version-display": "9.0.15"
+      }
+    }
+  ]
+}
