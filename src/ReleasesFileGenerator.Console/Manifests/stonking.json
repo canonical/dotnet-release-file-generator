@@ -9,7 +9,7 @@
     "runtime-binary-package-name": "dotnet-runtime-11.0",
     "aspnetcore-runtime-binary-package-name": "aspnetcore-runtime-11.0",
     "sdk-binary-package-name": "dotnet-sdk-11.0",
-    "archive": "previews"
+    "archive": "ubuntu"
   },
   {
     "channel-version": "10.0",
