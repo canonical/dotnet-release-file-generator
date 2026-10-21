@@ -57,7 +57,7 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
         }
 
         throw new ApplicationException(
-            $"Failed to retrieve total size from {TotalSizeLink}. Status code: {response.StatusCode}");
+            LaunchpadClient.FormatHttpErrorMessage("Failed to retrieve total size", response));
     }
 
     public async Task<LaunchpadCollectionResponse<T>?> GetNextPageAsync()
@@ -78,7 +78,7 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
         }
 
         throw new ApplicationException(
-            $"Failed to retrieve next page from {NextCollectionLink}. Status code: {httpResponse.StatusCode}");
+            LaunchpadClient.FormatHttpErrorMessage("Failed to retrieve next page", httpResponse));
     }
 
     public async Task<LaunchpadCollectionResponse<T>?> GetPreviousPageAsync()
@@ -99,6 +99,6 @@ public class LaunchpadCollectionResponse<T> where T : LaunchpadEntryType
         }
 
         throw new ApplicationException(
-            $"Failed to retrieve previous page from {PreviousCollectionLink}. Status code: {httpResponse.StatusCode}");
+            LaunchpadClient.FormatHttpErrorMessage("Failed to retrieve previous page", httpResponse));
     }
 }

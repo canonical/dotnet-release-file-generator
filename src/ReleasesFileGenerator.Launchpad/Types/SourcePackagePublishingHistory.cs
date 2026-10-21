@@ -91,7 +91,8 @@ public class SourcePackagePublishingHistory : LaunchpadEntryType
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException($"Failed to get binary file URLs for source package {SourcePackageName}");
+            throw new ApplicationException(LaunchpadClient.FormatHttpErrorMessage(
+                $"Failed to get binary file URLs for source package {SourcePackageName}", response));
         }
 
         var result = await response.Content.ReadFromJsonAsync<IEnumerable<Uri>>(cancellationToken: cancellationToken);
@@ -110,7 +111,8 @@ public class SourcePackagePublishingHistory : LaunchpadEntryType
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException($"Failed to get changelog URL for source package {SourcePackageName}");
+            throw new ApplicationException(LaunchpadClient.FormatHttpErrorMessage(
+                $"Failed to get changelog URL for source package {SourcePackageName}", response));
         }
 
         var result = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);

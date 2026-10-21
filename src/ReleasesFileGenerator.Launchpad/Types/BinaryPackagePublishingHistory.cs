@@ -99,7 +99,8 @@ public class BinaryPackagePublishingHistory : LaunchpadEntryType
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException("Failed to get binary package files");
+            throw new ApplicationException(
+                LaunchpadClient.FormatHttpErrorMessage("Failed to get binary package files", response));
         }
 
         var result = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);

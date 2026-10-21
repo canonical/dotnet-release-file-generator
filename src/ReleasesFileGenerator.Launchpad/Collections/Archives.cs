@@ -14,7 +14,8 @@ public static class Archives
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException("Failed to get archive");
+            throw new ApplicationException(
+                LaunchpadClient.FormatHttpErrorMessage("Failed to get archive", response));
         }
 
         var result = await response.Content

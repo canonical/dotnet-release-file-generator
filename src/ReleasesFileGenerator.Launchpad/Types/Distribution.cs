@@ -32,7 +32,8 @@ public class Distribution : LaunchpadEntryType
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException("Failed to get series for distribution");
+            throw new ApplicationException(
+                LaunchpadClient.FormatHttpErrorMessage("Failed to get series for distribution", response));
         }
 
         var result = await response.Content.ReadFromJsonAsync<DistroSeries>(cancellationToken: cancellationToken);

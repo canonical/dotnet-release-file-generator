@@ -186,7 +186,8 @@ public class Archive : LaunchpadEntryType
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException("Failed to get distribution for archive");
+            throw new ApplicationException(
+                LaunchpadClient.FormatHttpErrorMessage("Failed to get distribution for archive", response));
         }
 
         var result = await response.Content.ReadFromJsonAsync<Distribution>(cancellationToken: cancellationToken);
@@ -220,7 +221,8 @@ public class Archive : LaunchpadEntryType
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException("Failed to get binary package publishing history");
+            throw new ApplicationException(
+                LaunchpadClient.FormatHttpErrorMessage("Failed to get binary package publishing history", response));
         }
 
         var result = await response.Content
@@ -256,7 +258,8 @@ public class Archive : LaunchpadEntryType
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException("Failed to get source package publishing history");
+            throw new ApplicationException(
+                LaunchpadClient.FormatHttpErrorMessage("Failed to get source package publishing history", response));
         }
 
         var result = await response.Content
