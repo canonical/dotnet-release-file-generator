@@ -1,0 +1,151 @@
+{
+  "channel-version": "11.0",
+  "latest-release": "11.0.0-rc.2",
+  "latest-release-date": "2026-10-20",
+  "latest-runtime": "11.0.0-rc.2",
+  "latest-sdk": "11.0.100-rc.2",
+  "support-phase": "preview",
+  "release-type": "sts",
+  "eol-date": null,
+  "lifecycle-policy": null,
+  "releases": [
+    {
+      "release-date": "2026-10-20",
+      "release-version": "11.0.0-rc.2",
+      "security": true,
+      "cve-list": [
+        {
+          "cve-id": "CVE-2026-102870",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-102870"
+        },
+        {
+          "cve-id": "CVE-2026-58280",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-58280"
+        },
+        {
+          "cve-id": "CVE-2026-66822",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-66822"
+        },
+        {
+          "cve-id": "CVE-2026-69651",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-69651"
+        },
+        {
+          "cve-id": "CVE-2026-70159",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-70159"
+        },
+        {
+          "cve-id": "CVE-2026-70183",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-70183"
+        },
+        {
+          "cve-id": "CVE-2026-70188",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-70188"
+        },
+        {
+          "cve-id": "CVE-2026-70194",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-70194"
+        },
+        {
+          "cve-id": "CVE-2026-84008",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-84008"
+        },
+        {
+          "cve-id": "CVE-2026-88092",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-88092"
+        },
+        {
+          "cve-id": "CVE-2026-92707",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-92707"
+        },
+        {
+          "cve-id": "CVE-2026-96225",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96225"
+        },
+        {
+          "cve-id": "CVE-2026-96230",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96230"
+        },
+        {
+          "cve-id": "CVE-2026-96231",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96231"
+        },
+        {
+          "cve-id": "CVE-2026-96233",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96233"
+        },
+        {
+          "cve-id": "CVE-2026-96236",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96236"
+        },
+        {
+          "cve-id": "CVE-2026-96238",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96238"
+        },
+        {
+          "cve-id": "CVE-2026-96957",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96957"
+        },
+        {
+          "cve-id": "CVE-2026-96958",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96958"
+        },
+        {
+          "cve-id": "CVE-2026-96959",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96959"
+        },
+        {
+          "cve-id": "CVE-2026-96960",
+          "cve-url": "https://ubuntu.com/security/CVE-2026-96960"
+        }
+      ],
+      "release-notes": null,
+      "runtime": {
+        "version": "11.0.0-rc.2",
+        "version-display": "11.0.0-rc.2"
+      },
+      "sdk": {
+        "version": "11.0.100-rc.2",
+        "version-display": "11.0.100-rc.2",
+        "runtime-version": "11.0.0-rc.2"
+      },
+      "sdks": [
+        {
+          "version": "11.0.100-rc.2",
+          "version-display": "11.0.100-rc.2",
+          "runtime-version": "11.0.0-rc.2"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "11.0.0-rc.2",
+        "version-display": "11.0.0-rc.2"
+      }
+    },
+    {
+      "release-date": "2026-10-11",
+      "release-version": "11.0.0-rc.1",
+      "security": false,
+      "release-notes": null,
+      "runtime": {
+        "version": "11.0.0-rc.1",
+        "version-display": "11.0.0-rc.1"
+      },
+      "sdk": {
+        "version": "11.0.100-rc.1",
+        "version-display": "11.0.100-rc.1",
+        "runtime-version": "11.0.0-rc.1"
+      },
+      "sdks": [
+        {
+          "version": "11.0.100-rc.1",
+          "version-display": "11.0.100-rc.1",
+          "runtime-version": "11.0.0-rc.1"
+        }
+      ],
+      "aspnetcore-runtime": {
+        "version": "11.0.0-rc.1",
+        "version-display": "11.0.0-rc.1"
+      }
+    }
+  ]
+}
